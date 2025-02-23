@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>BoomX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/16d4885483.js" crossorigin="anonymous"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            500: '#8B5CF6',
+                            600: '#7C3AED',
+                            700: '#6D28D9',
+                            800: '#5B21B6', 
+                            900: '#4C1D95'
+                        }
+                    }   
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-primary-800 text-white hidden lg:block">
+            <div class="p-4">
+                <img src="/img/logo.png" alt="Men Fashion Dashboard" class="h-8">
+            </div>
+            
+            <nav class="mt-8">
+                <div class="px-4 space-y-1">
+                    <a href="/admin/dashboard" class="flex items-center px-4 py-3 text-white hover:bg-primary-700 rounded-lg">
+                        <i class="material-icons mr-3"></i>
+                        <span>Dashboard</span>
+                    </a>    
+                    
+                    <a href="/admin/users" class="flex items-center px-4 py-3 text-white hover:bg-primary-700 rounded-lg">
+                        <i class="material-icons mr-3"></i>
+                        <span>Customers</span>
+                    </a>
+                    
+                    <a href="/admin/category" class="flex items-center px-4 py-3 text-white hover:bg-primary-700 rounded-lg">
+                        <i class="material-icons mr-3"></i>
+                        <span>Category</span>
+                    </a>
+                    
+                    <a href="/admin/brands" class="flex items-center px-4 py-3 text-white hover:bg-primary-700 rounded-lg">
+                        <i class="material-icons mr-3"></i>
+                        <span>Brands</span>
+                    </a>
+                    
+                    <a href="/admin/products" class="flex items-center px-4 py-3 text-white hover:bg-primary-700 rounded-lg">
+                        <i class="material-icons mr-3"></i>
+                        <span>Products</span>
+                    </a>
+                    
+                    <a href="/admin/addProducts" class="flex items-center px-4 py-3 text-white hover:bg-primary-700 rounded-lg">
+                        <i class="material-icons mr-3"></i>
+                        <span>Add Product</span>
+                    </a>
+                    
+                    <a href="/admin/coupon" class="flex items-center px-4 py-3 text-white hover:bg-primary-700 rounded-lg">
+                        <i class="material-icons mr-3"></i>
+                        <span>Coupon</span>
+                    </a>
+                    
+                    <a href="/admin/banner" class="flex items-center px-4 py-3 text-white hover:bg-primary-700 rounded-lg">
+                        <i class="material-icons mr-3"></i>
+                        <span>Banner</span>
+                    </a>
+                    
+                    <a href="/admin/orderList" class="flex items-center px-4 py-3 text-white hover:bg-primary-700 rounded-lg">
+                        <i class="material-icons mr-3"></i>
+                        <span>Orders</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col bg-primary-800/5">
+            <!-- Top Navigation -->
+            <header class="bg-primary shadow">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div class="flex justify-between items-center">
+                        <button class="lg:hidden text-gray-500 hover:text-gray-700">
+                            <i class="material-icons">menu</i>
+                        </button>
+                        
+                        <div class="flex items-center">
+                            <div class="relative">
+                                <button class="flex items-center space-x-2 relative" id="user-menu-button">
+                                    <img class="h-8 w-8 rounded-full" src="/admin-assets/imgs/people/avatar2.jpg" alt="User">
+                                    <i class="material-icons text-gray-400">arrow_drop_down</i>
+                                </button>
+                                
+                                <!-- Dropdown Menu -->
+                                <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1" id="user-menu">
+                                    <a href="/admin/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                        <i class="material-icons text-sm mr-2">exit_to_app</i>
+                                        Logout
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>

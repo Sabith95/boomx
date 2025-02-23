@@ -1,0 +1,170 @@
+<%- include('../layouts/header') %> 
+
+<body class="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-800 flex items-center justify-center p-4">
+  <!-- Main Login Form -->
+  <div class="bg-white rounded-2xl shadow-xl flex flex-col md:flex-row w-full max-w-4xl">
+    <!-- Left Side - Form -->
+    <div class="md:w-1/2 p-6 md:p-12 flex flex-col justify-center">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800">BoomX Login</h1>
+        <p class="text-gray-600 mt-2">Sign in to your account</p>
+      </div>
+      
+      <form class="space-y-6" id="loginForm" novalidate>
+        <div>
+          <input type="email" name="email" id="email" placeholder="Email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+          <!-- Inline error for email -->
+          <div class="text-red-500 text-xs mt-1" id="emailError"></div>
+        </div>
+        <div>
+          <input type="password" name="password" id="password" placeholder="Password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+          <!-- Inline error for password -->
+          <div class="text-red-500 text-xs mt-1" id="passwordError"></div>
+        </div>
+        <div class="text-right">
+          <!-- The href is preserved but will be intercepted to open our modal -->
+          <a href="/user/forgot-password" class="text-purple-600 hover:underline text-sm" id="forgotPasswordLink">Forgot Password?</a>
+        </div>
+        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+          Log In
+        </button>
+      </form>
+      
+      <!-- Social Login Options -->
+      <div class="mt-4 flex space-x-2 justify-center">
+        <a href="/user/auth/google" class="flex items-center px-3 py-1.5 border rounded-md text-white bg-red-500 hover:bg-red-600 transition text-sm">
+          <img src="https://www.svgrepo.com/show/303108/google-icon-logo.svg" alt="Google" class="h-4 w-4 mr-1">
+          Sign in with Google
+        </a>
+      </div>
+      
+      <!-- Signup Link -->
+      <p class="mt-3 text-xs text-gray-600 text-center">
+        Don't have an account? 
+        <a href="/user/signup" class="text-purple-600 hover:underline font-medium">Sign Up</a>
+      </p>
+    </div>
+    <!-- Right Side - Image -->
+    <div class="md:w-1/2 bg-purple-100 rounded-r-2xl overflow-hidden relative hidden md:block">
+      <img src="/images/logos/admin-login.png" alt="Headphones" class="object-cover w-full h-full">
+      <div class="absolute inset-0 bg-gradient-to-br from-purple-600/50 to-indigo-800/50 flex items-center justify-center">
+        <div class="text-white text-center p-6">
+          <h2 class="text-3xl font-bold mb-4">Welcome Back to BoomX</h2>
+          <p class="text-lg">Experience the power of sound</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include SweetAlert from a CDN -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script>
+    // Login form submission (unchanged)
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault(); 
+      document.getElementById('emailError').innerText = '';
+      document.getElementById('passwordError').innerText = '';
+      
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      
+      let hasError = false;
+      if (!email) {
+        document.getElementById('emailError').innerText = 'Email is required.';
+        hasError = true;
+      } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          document.getElementById('emailError').innerText = 'Please enter a valid email address.';
+          hasError = true;
+        }
+      }
+      
+      if (!password) {
+        document.getElementById('passwordError').innerText = 'Password is required.';
+        hasError = true;
+      } else if (password.length < 6) {
+        document.getElementById('passwordError').innerText = 'Password must be at least 6 characters.';
+        hasError = true;
+      }
+      
+      if (hasError) return;
+      
+      try {
+        const response = await fetch('/user/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          swal("Success", data.message, "success").then(() => {
+            window.location.href = "/user/dashboard";
+          });
+        } else {
+          swal("Error", data.error || "Login failed.", "error");
+        }
+      } catch (error) {
+        console.error("Error during login:", error);
+        swal("Error", "Something went wrong. Please try again later.", "error");
+      }
+    });
+
+    // Forgot Password - Email Modal using SweetAlert
+    document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      swal({
+        title: "Forgot Password",
+        content: {
+          element: "input",
+          attributes: {
+            placeholder: "Enter your email",
+            type: "email",
+            id: "forgotEmailInput"
+          },
+        },
+        buttons: {
+          cancel: true,
+          confirm: {
+            text: "Send OTP",
+            closeModal: false,
+          }
+        }
+      }).then(async (value) => {
+        if (!value) {
+          swal.close();
+          return;
+        }
+        const email = document.getElementById('forgotEmailInput').value.trim();
+        if (!email) {
+          swal("Error", "Email is required.", "error");
+          return;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          swal("Error", "Please enter a valid email address.", "error");
+          return;
+        }
+        try {
+          const response = await fetch('/user/forgot-password/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+          const data = await response.json();
+          if (response.ok) {
+            swal("Success", data.message, "success").then(() => {
+              window.location.href = "/user/forgot-password/otp";
+            });
+          } else {
+            swal("Error", data.error || "Failed to send OTP.", "error");
+          }
+        } catch (error) {
+          console.error("Error sending OTP:", error);
+          swal("Error", "Something went wrong. Please try again later.", "error");
+        }
+      });
+    });
+  </script>
+  
+</body>

@@ -1,0 +1,35 @@
+const express = require('express');
+const user_route = express.Router();
+const passport = require('../config/passport');
+const jwt = require('jsonwebtoken');
+const userController = require('../controllers/userController');
+
+// Google login route
+user_route.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+user_route.get('/auth/google/callback', passport.authenticate('google', { 
+    failureRedirect: '/user/login',
+    session: false
+}), (req, res) => {
+    const token = req.user.token;
+    res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
+    res.redirect('/user/dashboard');
+});
+
+// Google login callback
+user_route.get('/signup', userController.loadSignUp);
+user_route.post('/send-otp', userController.sendOtp);
+user_route.post('/verify-otp', userController.verifyOtp);
+user_route.get('/login', userController.loadLogin);
+user_route.post('/login', userController.userVerifyLogin);
+
+// Forgot Password Routes
+user_route.post('/forgot-password/send-otp', userController.forgotPasswordSendOtp);
+user_route.post('/forgot-password/verify-otp', userController.forgotPasswordVerifyOtp);
+user_route.post('/forgot-password/reset-password', userController.resetPassword);
+user_route.get('/forgot-password/otp', userController.loadOtpPage);
+user_route.get('/forgot-password/reset-password', userController.loadResetPasswordPage);
+
+user_route.get('/dashboard', userController.loadDashboard);
+
+module.exports = user_route;

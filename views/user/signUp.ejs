@@ -1,0 +1,308 @@
+<%- include('../layouts/header')%>
+
+<body class="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-800 flex items-center justify-center p-4">
+    <!-- Main Signup Form -->
+    <div class="bg-white rounded-2xl shadow-xl flex flex-col md:flex-row w-full max-w-4xl">
+        <!-- Left Side - Form -->
+        <div class="md:w-1/2 p-6 md:p-12 flex flex-col justify-center">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-800">BoomX Sign Up</h1>
+                <p class="text-gray-600 mt-2">Create your account to get started</p>
+            </div>
+            
+            <form class="space-y-6" action="/user/signup" method="POST" id="signupForm">
+                <div>
+                    <input type="text" name="name" id="name" placeholder="Full Name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+                    <p id="nameError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <div>
+                    <input type="email" name="email" id="email" placeholder="Email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+                    <p id="emailError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <div>
+                    <input type="text" name="mobile" id="mobile" placeholder="Mobile Number" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+                    <p id="mobileError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <div>
+                    <input type="password" name="password" id="password" placeholder="Password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+                    <p id="passwordError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <div>
+                    <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+                    <p id="confirmPasswordError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                    Sign Up
+                </button>
+            </form>
+
+
+            <!-- Login Link (Smaller Text) -->
+            <p class="mt-3 text-xs text-gray-600 text-center">
+                Already have an account? 
+                <a href="/user/login" class="text-purple-600 hover:underline font-medium">Log in</a>
+            </p>
+
+        </div>
+        <!-- Right Side - Image -->
+        <div class="md:w-1/2 bg-purple-100 rounded-r-2xl overflow-hidden relative hidden md:block">
+            <img src="/images/logos/admin-login.png" alt="Headphones" class="object-cover w-full h-full">
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-600/50 to-indigo-800/50 flex items-center justify-center">
+                <div class="text-white text-center p-6">
+                    <h2 class="text-3xl font-bold mb-4">Welcome to BoomX</h2>
+                    <p class="text-lg">Experience the power of sound</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div id="otpModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-96">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Verify OTP</h2>
+                <button id="closeOtpModal" class="text-gray-600 hover:text-gray-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <p class="text-gray-600 mb-4">Enter the OTP sent to your email</p>
+            <div class="space-y-4">
+                <input type="text" id="otp" placeholder="Enter OTP" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" maxlength="6">
+                <div class="text-center text-gray-600" id="otpTimer">Time remaining: 01:00</div>
+                <div class="flex space-x-4">
+                    <button id="verifyOtpBtn" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                        Verify OTP
+                    </button>
+                    <button id="resendOtpBtn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-md transition duration-300" disabled>
+                        Resend OTP
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        let otpToken = "";
+        let otpTimer;
+        let timeLeft = 60;
+
+        function resetOtpModal() {
+            // Clear OTP input
+            document.getElementById('otp').value = '';
+            // Reset timer display
+            document.getElementById('otpTimer').textContent = 'Time remaining: 01:00';
+            // Reset resend button state
+            document.getElementById('resendOtpBtn').disabled = true;
+            // Clear the timer
+            clearInterval(otpTimer);
+            timeLeft = 60;
+        }
+
+        function startOtpTimer() {
+            timeLeft = 60;
+            const timerDisplay = document.getElementById('otpTimer');
+            const resendBtn = document.getElementById('resendOtpBtn');
+            resendBtn.disabled = true;
+
+            otpTimer = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `Time remaining: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    timerDisplay.textContent = 'OTP expired';
+                    resendBtn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        function showOtpModal() {
+            resetOtpModal(); // Reset modal state before showing
+            document.getElementById('otpModal').classList.remove('hidden');
+            startOtpTimer();
+        }
+
+        function hideOtpModal() {
+            document.getElementById('otpModal').classList.add('hidden');
+            resetOtpModal(); // Reset modal state when hiding
+            clearInterval(otpTimer);
+        }
+
+        // Form validation and submission
+        document.getElementById("signupForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const mobile = document.getElementById("mobile").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            // Reset error messages
+            const errorElements = document.querySelectorAll("[id$='Error']");
+            errorElements.forEach(el => el.classList.add("hidden"));
+
+            let isValid = true;
+
+            // Validation rules
+            if (name.length < 3) {
+                document.getElementById("nameError").textContent = "Name must be at least 3 characters";
+                document.getElementById("nameError").classList.remove("hidden");
+                isValid = false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById("emailError").textContent = "Invalid email format";
+                document.getElementById("emailError").classList.remove("hidden");
+                isValid = false;
+            }
+
+            const phoneRegex = /^[0-9]{10}$/;
+            if (!phoneRegex.test(mobile)) {
+                document.getElementById("mobileError").textContent = "Mobile number must be 10 digits";
+                document.getElementById("mobileError").classList.remove("hidden");
+                isValid = false;
+            }
+
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+            if (!passwordRegex.test(password)) {
+                document.getElementById("passwordError").textContent = "Password must be at least 6 characters, include 1 uppercase, 1 lowercase, 1 number & 1 special character";
+                document.getElementById("passwordError").classList.remove("hidden");
+                isValid = false;
+            }
+
+            if (password !== confirmPassword) {
+                document.getElementById("confirmPasswordError").textContent = "Passwords do not match";
+                document.getElementById("confirmPasswordError").classList.remove("hidden");
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            try {
+                const response = await fetch("/user/send-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, mobile, password }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    otpToken = result.token;
+                    showOtpModal(); // This will now reset the modal before showing
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: result.error,
+                        icon: "error",
+                        confirmButtonText: "Try again"
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    title: "Something went wrong",
+                    text: "Please try again later",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+            }
+        });
+
+        // OTP verification
+        document.getElementById("verifyOtpBtn").addEventListener("click", async () => {
+            const otp = document.getElementById("otp").value.trim();
+
+            try {
+                const response = await fetch("/user/verify-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ otp, token: otpToken }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    hideOtpModal(); // This will now reset the modal
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Account created successfully",
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        window.location.href = "/user/login";
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: result.error,
+                        icon: "error",
+                        confirmButtonText: "Try again"
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    title: "Something went wrong",
+                    text: "Please try again later",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+            }
+        });
+
+        // Resend OTP
+        document.getElementById("resendOtpBtn").addEventListener("click", async () => {
+            const email = document.getElementById("email").value.trim();
+
+            try {
+                const response = await fetch("/user/send-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    otpToken = result.token;
+                    document.getElementById('otp').value = ''; // Clear OTP input on resend
+                    startOtpTimer();
+                    Swal.fire({
+                        title: "OTP Resent",
+                        text: "Please check your email",
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: result.error,
+                        icon: "error",
+                        confirmButtonText: "Try again"
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    title: "Something went wrong",
+                    text: "Please try again later",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+            }
+        });
+
+        // Close modal button
+        document.getElementById("closeOtpModal").addEventListener("click", hideOtpModal);
+    </script>
+
+<%- include('../layouts/footer')%>
+

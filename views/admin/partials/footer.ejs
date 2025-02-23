@@ -1,0 +1,28 @@
+<footer class="bg-white border-t mt-auto">
+    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-gray-500 text-sm">
+            © 2025 BoomX. All rights reserved.
+        </p>
+    </div>
+</footer>
+</div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Toggle user menu
+document.getElementById('user-menu-button').addEventListener('click', function() {
+document.getElementById('user-menu').classList.toggle('hidden');
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', function(event) {
+if (!event.target.closest('#user-menu-button')) {
+    document.getElementById('user-menu').classList.add('hidden');
+}
+});
+</script>
+</body>
+</html>

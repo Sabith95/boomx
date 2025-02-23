@@ -1,0 +1,94 @@
+<%- include('../layouts/header') %>
+
+<body class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-4 text-center">OTP Verification</h2>
+    <p class="mb-4 text-center">Please enter the OTP sent to your email.</p>
+    <div id="otpForm" class="space-y-4">
+      <input type="text" id="otpInput" placeholder="Enter OTP" class="w-full px-3 py-2 border rounded-md" />
+      <div id="otpError" class="text-red-500 text-sm"></div>
+      <div class="text-center">
+        <span id="otpTimer" class="text-gray-700"></span>
+      </div>
+      <div class="flex justify-between">
+        <button id="resendOtp" class="px-4 py-2 bg-yellow-500 text-white rounded">Resend OTP</button>
+        <button id="verifyOtp" class="px-4 py-2 bg-purple-600 text-white rounded">Verify OTP</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script>
+    let otpTimeRemaining = 60;
+    let otpTimerInterval = null;
+
+    function startOtpTimer() {
+      otpTimeRemaining = 60;
+      document.getElementById('otpTimer').innerText = `Time remaining: ${otpTimeRemaining} seconds`;
+      otpTimerInterval = setInterval(() => {
+        otpTimeRemaining--;
+        document.getElementById('otpTimer').innerText = `Time remaining: ${otpTimeRemaining} seconds`;
+        if (otpTimeRemaining <= 0) {
+          clearInterval(otpTimerInterval);
+          document.getElementById('otpTimer').innerText = `OTP expired. Please resend OTP.`;
+        }
+      }, 1000);
+    }
+
+    document.getElementById('verifyOtp').addEventListener('click', async function() {
+      document.getElementById('otpError').innerText = '';
+      const otpValue = document.getElementById('otpInput').value.trim();
+      if (!otpValue) {
+        document.getElementById('otpError').innerText = 'OTP is required.';
+        return;
+      }
+      if (otpTimeRemaining <= 0) {
+        document.getElementById('otpError').innerText = 'OTP has expired. Please resend OTP.';
+        return;
+      }
+      try {
+        const response = await fetch('/user/forgot-password/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ otp: otpValue })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          swal("Success", data.message, "success").then(() => {
+            window.location.href = "/user/forgot-password/reset-password";
+          });
+        } else {
+          swal("Error", data.error || "OTP verification failed.", "error");
+        }
+      } catch (error) {
+        console.error("Error verifying OTP:", error);
+        swal("Error", "Something went wrong. Please try again later.", "error");
+      }
+    });
+
+    document.getElementById('resendOtp').addEventListener('click', async function() {
+      try {
+        // When resending, no email is needed since it is stored in session.
+        const response = await fetch('/user/forgot-password/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+          // No body sent; the controller will use session email.
+        });
+        const data = await response.json();
+        if (response.ok) {
+          swal("Success", data.message, "success");
+          clearInterval(otpTimerInterval);
+          startOtpTimer();
+        } else {
+          swal("Error", data.error || "Failed to resend OTP.", "error");
+        }
+      } catch (error) {
+        console.error("Error resending OTP:", error);
+        swal("Error", "Something went wrong. Please try again later.", "error");
+      }
+    });
+
+    // Start OTP timer on page load
+    startOtpTimer();
+  </script>
+</body>
