@@ -103,12 +103,22 @@ const editCategory = async (req, res) => {
       if (duplicate) {
         return res.status(400).json({ success: false, message: 'A category with that name already exists' });
       }
-  
+      
+      const updateData ={
+        name: name.trim() ,
+        description:description.trim()
+      }
+
+      if(req.file){
+        updateData.image = '/uploads/' + req.file.filename
+      }
+
+
       // Update the category if no duplicate exists
       const updatedCategory = await category.findByIdAndUpdate(
         id,
-        { name: name.trim(), description: description.trim() },
-        { new: true }
+        updateData,
+        {new:true}
       );
   
       if (!updatedCategory) {
