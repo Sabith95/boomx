@@ -12,6 +12,8 @@ const upload = require('../config/multerConfig')
 const adminController  = require('../controllers/adminController')
 const categoryController = require('../controllers/catagoryController')
 const brandController = require('../controllers/brandController')
+const productController =require('../controllers/productController')
+
 
 
 
@@ -43,6 +45,16 @@ admin_route.post('/category',upload.single('image'),categoryController.verifyCat
  // listong and unlisting brand
  admin_route.get('/brands/unlist/:id',brandController.unlistBrand)
  admin_route.get('/brands/list/:id',brandController.listBrand)
+
+ // editing brand
+
+ admin_route.get('/brands/edit/:id',brandController.loadEdit)
+ admin_route.put('/brands/edit/:id',upload.single('image'),brandController.editBrand)
+
+
+ // product section
+
+ admin_route.get('/addProducts',productController.loadProducts)
 
 
  

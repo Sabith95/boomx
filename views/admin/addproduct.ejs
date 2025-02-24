@@ -1,0 +1,179 @@
+<%- include("../admin/partials/header") %>
+<head>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+
+<div class="p-6 bg-gray-100">
+   <h2 class="text-2xl font-semibold text-primary-800 mb-6">Add New Product</h2>
+   
+   <div class="bg-white rounded-lg shadow-md">
+       <div class="p-6">
+           <form method="" action="" enctype="multipart/form-data ">
+               <div class="mb-4">
+                   <label for="product_name" class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                   <input type="text" placeholder="Type here" name="productName" class="w-full px-3 py-2 border border-gray-300 rounded-md" id="product_name">
+                   <div id="productName-error" class="text-red-500 text-sm mt-1"></div>
+               </div>
+               
+               <div class="mb-4">
+                   <label class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                   <select class="w-full px-3 py-2 border border-gray-300 rounded-md" name="brand">
+                       <option value="">Select Brand</option>
+                       <!-- Add brand options here -->
+                   </select>
+                   <div id="brand-error" class="text-red-500 text-sm mt-1"></div>
+               </div>
+               
+               <div class="mb-4">
+                   <label class="block text-sm font-medium text-gray-700 mb-1">Full description</label>
+                   <textarea placeholder="Type here" id="descriptionid" name="description" class="w-full px-3 py-2 border border-gray-300 rounded-md" rows="4"></textarea>
+                   <div id="description-error" class="text-red-500 text-sm mt-1"></div>
+               </div>
+               
+               <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                   <div>
+                       <label class="block text-sm font-medium text-gray-700 mb-1">Regular price</label>
+                       <input placeholder="$" name="regularPrice" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                       <div id="regularPrice-error" class="text-red-500 text-sm mt-1"></div>
+                   </div>
+                   <div>
+                       <label class="block text-sm font-medium text-gray-700 mb-1">Sale price</label>
+                       <input placeholder="$" name="salePrice" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                       <div id="salePrice-error" class="text-red-500 text-sm mt-1"></div>
+                   </div>
+                   <div>
+                       <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                       <input placeholder="" name="quantity" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                       <div id="quantity-error" class="text-red-500 text-sm mt-1"></div>
+                   </div>
+               </div>
+               
+               <!-- <div class="mb-4">
+                   <label class="block text-sm font-medium text-gray-700 mb-1">Variants</label>
+                   <div class="space-y-2" id="variants-container">
+                       <div class="flex gap-4">
+                           <input type="text" placeholder="Size" name="variants[]" class="w-1/2 px-3 py-2 border border-gray-300 rounded-md">
+                           <input type="text" placeholder="Color" name="variants[]" class="w-1/2 px-3 py-2 border border-gray-300 rounded-md">
+                       </div>
+                   </div>
+                   <button type="button" onclick="addVariant()" class="mt-2 px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">+ Add Variant</button>
+                   <div id="variants-error" class="text-red-500 text-sm mt-1"></div>
+               </div> -->
+               
+               <div class="mb-4">
+                   <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                   <select class="w-full px-3 py-2 border border-gray-300 rounded-md" name="category">
+                       <option value="">Select Category</option>
+                       <!-- Add category options here -->
+                   </select>
+                   <div id="category-error" class="text-red-500 text-sm mt-1"></div>
+               </div>
+               
+               <div class="bg-white rounded-lg shadow-md mb-4">
+                   <div class="p-4 border-b">
+                       <h4 class="text-lg font-semibold">Product Image</h4>
+                   </div>
+                   <div class="p-4">
+                       <div id="addedImagesContainer" class="flex overflow-x-auto space-x-4 mb-4"></div>
+                       <div class="space-y-2">
+                           <img src="/placeholder.svg" alt="" id="imgView" class="w-full h-40 object-cover rounded-md">
+                           <input class="w-full px-3 py-2 border border-gray-300 rounded-md" type="file" name="image" id="imageInput"
+                               accept="image/png, image/jpeg, image/jpg" multiple
+                               onchange="viewImage(event)">
+                       </div>
+                        <!-- Cropping interface -->
+                    <div class="image-cropper items-center hidden" style="width: 300px; height: 200px;">
+                        <img src="/placeholder.svg" id="croppedImg" alt="" class="max-w-full max-h-full">
+                         <button type="button" id="saveButton" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">Save</button>
+                    </div>
+                     <div id="image-error" class="text-red-500 text-sm mt-2"></div>
+                   </div>
+               </div>
+               
+               <div>
+                   <button class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700" type="button" onclick="validateAndSubmit()">Publish</button>
+               </div>
+           </form>
+       </div>
+   </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+  var cropper;
+   var filesToCrop = [];
+   var currentFileIndex = 0;
+
+   function viewImage(event) {
+       const files = event.target.files;
+       // Limit to 3 images using Toastify for notification
+       if(files.length > 3) {
+           Toastify({
+               text: "Please select only three images.",
+               duration: 3000,
+               gravity: "top", // top or bottom
+               position: "center", // left, center or right
+               backgroundColor: "red",
+           }).showToast();
+           return;
+       }
+       filesToCrop = Array.from(files);
+       currentFileIndex = 0;
+       // Clear any previous images from the container
+       document.getElementById('addedImagesContainer').innerHTML = "";
+       // Start cropping for the first file
+       openCropperForCurrentFile();
+   }
+
+   function openCropperForCurrentFile() {
+       if(currentFileIndex >= filesToCrop.length) {
+           // No more files to crop, hide cropping interface
+           document.querySelector('.image-cropper').classList.add('hidden');
+           return;
+       }
+       const file = filesToCrop[currentFileIndex];
+       const reader = new FileReader();
+       reader.onload = function(e) {
+           const cropperContainer = document.querySelector('.image-cropper');
+           cropperContainer.classList.remove('hidden');
+           const croppedImg = document.getElementById('croppedImg');
+           croppedImg.src = e.target.result;
+           // Destroy any existing cropper instance before creating a new one
+           if (cropper) {
+               cropper.destroy();
+           }
+           cropper = new Cropper(croppedImg, {
+               aspectRatio: 16 / 9, // Adjust as needed
+               viewMode: 1,
+           });
+       }
+       reader.readAsDataURL(file);
+   }
+
+   document.getElementById('saveButton').addEventListener('click', function(){
+       if(cropper) {
+           const canvas = cropper.getCroppedCanvas();
+           // Create a new image element for the cropped image
+           const imgElement = document.createElement('img');
+           imgElement.src = canvas.toDataURL();
+           imgElement.className = "w-40 h-40 object-cover rounded-md";
+           // Append the cropped image to the container
+           document.getElementById('addedImagesContainer').appendChild(imgElement);
+           // Destroy the cropper instance and hide cropping UI if needed
+           cropper.destroy();
+           cropper = null;
+           // Move to next file
+           currentFileIndex++;
+           if(currentFileIndex < filesToCrop.length) {
+               openCropperForCurrentFile();
+           } else {
+               // All images processed, hide cropping UI
+               document.querySelector('.image-cropper').classList.add('hidden');
+           }
+       }
+   });
+</script>
+
+<%- include("../admin/partials/footer") %>
