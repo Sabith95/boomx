@@ -3,8 +3,24 @@ const brand = require('../models/brandModel')
 const loadBrands = async(req,res)=>{
     try {
 
-        const brands = await brand.find()
-        res.render('admin/brand',{brands})
+        const page = parseInt(req.query.page) || 1
+        const limit = 5
+        const skip = (page -1) *limit
+
+        const querySearch = req.query.search ? req.query.search.trim():""
+        const filter={}
+        if(querySearch){
+            filter.name={$regex :new RegExp(querySearch,"i")}
+        }
+
+
+        const brands = await brand.find(filter).sort({createdAt:-1}).skip(skip).limit(limit)
+        const totalDocuments = await brand.countDocuments()
+        const totalPages = await Math.ceil(totalDocuments / limit) 
+
+
+        res.render('admin/brand',{brands,search:querySearch,currentPage:page,totalPages})
+     
     } catch (error) {
         console.log(error.message)
     }
@@ -31,7 +47,7 @@ const verifyBrand = async(req,res)=>{
     }
 }
 
-const unlistBrand = async(req,res)=>{
+const   unlistBrand = async(req,res)=>{
     try {
         const brandId = req.params.id
         const updatedBrand = await brand.findByIdAndUpdate(
@@ -65,9 +81,67 @@ const listBrand = async(req,res)=>{
     }
     
 }
+
+//editing brand
+
+const loadEdit = async(req,res)=>{
+    try {
+        const brandToEdit = await brand.findById(req.params.id)
+        if(!brandToEdit){
+            return res.status(404).send("Brand not found")
+        }
+        res.render('admin/editBrand', { brand: brandToEdit });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send("An error occurred");
+    }
+   
+}
+
+const editBrand  = async (req,res)=>{
+    try {
+
+        const {id} = req.params
+        const {name,description} = req.body
+
+        if(!name || !description){
+            return res.status(400).json({success:false,message:"Name and Descriptions are required"})
+        }
+        const duplicate = await brand.findOne({
+            name:name.trim(),
+            _id:{$ne:id}
+        })
+        if(duplicate){
+            res.status(400).json({success:false,message:"A brand with that name already exist"})
+        }
+        const updateData={
+            name:name.trim(),
+            description:description.trim()
+        }
+        if(req.file){
+            updateData.image ='/uploads/' + req.file.filename
+        }
+        const updatedBrand = await brand.findByIdAndUpdate(
+            id,
+            updateData,
+            {new:true}
+        )
+        if(!updatedBrand){
+            res.status(400).json({success:false,message:"Brand not found"})
+        }
+        return res.status(200).json({success:true,message:"Brand updated",brand:updatedBrand})
+    } catch (error) {
+        console.log(error.message)
+        return res.status(500).json({ success: false, message: "Something went wrong" });
+
+    }
+}
+
 module.exports= {
     loadBrands,
     verifyBrand,
     unlistBrand,
-    listBrand
+    listBrand,
+    loadEdit,
+    editBrand
 }
