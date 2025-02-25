@@ -1,0 +1,145 @@
+<%- include("../admin/partials/header") -%>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+</head>
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+        <h2  class="text-3xl font-bold text-primary-900 font-bold">Products</h2>
+    </div>
+
+    <div class="mb-8">
+        <form action="" method="get" class="flex justify-center">
+            <div class="relative">
+                <input
+                    type="text"
+                    class="w-96 pl-4 pr-10 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Search products or brands"
+                    name="search"
+                >
+                <button
+                    class="absolute right-0 top-0 mt-2 mr-3 text-gray-400 hover:text-gray-600"
+                    type="submit"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md">
+        <table class="w-full table-auto border-collapse">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="px-4 py-2 text-left">Product name</th>
+                    <th class="px-4 py-2 text-left">Product description</th>
+                    <th class="px-4 py-2 text-left">Brand</th>
+                    <th class="px-4 py-2 text-left">Category</th>
+                    <th class="px-4 py-2 text-left">Sale Price</th>
+                    <th class="px-4 py-2 text-left">Regular Price</th>
+                    <th class="px-4 py-2 text-left">Quantity</th>
+                    <th class="px-4 py-2 text-left">Action</th>
+                    <th class="px-4 py-2 text-left">Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (products && products.length) { %>
+                    <% products.forEach(function(product){ %>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2"><%=product.name %></td>
+                            <td class="px-4 py-2"><%=product.description %></td>
+                            <td class="px-4 py-2"><%=product.brand.name %></td>
+                            <td class="px-4 py-2"><%=product.category.name %></td>
+                            <td class="px-4 py-2"><%=product.salePrice %></td>
+                            <td class="px-4 py-2"><%=product.regularPrice %></td>
+                            <td class="px-4 py-2"><%=product.quantity %></td>
+                                <td class="px-4 py-2">
+                                    <% if (product.isListed) { %>
+                                      <button type="button" 
+                                              class="changeStatus bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded" 
+                                              data-id="<%= product._id %>" 
+                                              data-status="unlist">
+                                        Unlist
+                                      </button>
+                                    <% } else { %>
+                                      <button type="button" 
+                                              class="changeStatus bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" 
+                                              data-id="<%= product._id %>" 
+                                              data-status="list">
+                                        List
+                                      </button>
+                                    <% } %>
+                                  </td>
+                                  
+                            
+                            <td class="px-4 py-2">
+                                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                                    <a href="" class="text-white no-underline">Edit</a>
+                                </button>
+                            </td>
+                        </tr>
+                   
+                   
+                <% }) %>
+            </tbody>
+            <% } else { %>
+                <tr>
+                    <td colspan="8" class="px-4 py-2 text-center">No products found</td>
+                </tr>
+                <% } %>
+        </table>
+    </div>
+</div>
+
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> 
+
+<script>
+    document.querySelectorAll('.changeStatus').forEach(button=>{
+        button.addEventListener('click',function(){
+            const productId=this.getAttribute('data-id')
+            const action = this.getAttribute('data-status')
+            const confirmText =(action === 'unlist')?'Do you want to unlist this product?' : 'Do you want to list this product?';
+            Swal.fire({
+            title: 'Are you sure?',
+            text: confirmText,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No'
+
+        }).then((result) => {
+
+        if (result.isConfirmed) {
+            // Send AJAX request using PATCH to update status
+            fetch(`/admin/products/${productId}/changeStatus`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+            if (data.success) {
+                Swal.fire('Success!', data.message, 'success')
+                .then(() => {
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire('Error!', data.message, 'error');
+            }
+            })
+            .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error!', 'Something went wrong!', 'error');
+            });
+        }
+        });
+        })
+        
+    })
+</script>
+
+<%- include("../admin/partials/footer") -%>

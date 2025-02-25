@@ -27,10 +27,10 @@ const productSchema = new mongoose.Schema({
         type: Number,
          required: true 
      },
-     images: [{ 
-        type: String, 
-        required: true 
-    }],
+     image  : {  
+        type: [String], 
+        required: [true] 
+     },
     isListed:{
         type:Boolean,
         default:true

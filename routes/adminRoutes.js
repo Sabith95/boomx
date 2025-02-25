@@ -54,7 +54,11 @@ admin_route.post('/category',upload.single('image'),categoryController.verifyCat
 
  // product section
 
- admin_route.get('/addProducts',productController.loadProducts)
+ admin_route.get('/addProducts',productController.loadAddProducts)
+ admin_route.post('/addProducts',upload.array('image',3),productController.verifyAddProduct)
+ admin_route.get('/products',productController.loadProducts)
+ admin_route.patch('/products/:id/changeStatus',productController.updateStatus)
+
 
 
  
