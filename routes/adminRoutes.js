@@ -13,6 +13,7 @@ const adminController  = require('../controllers/adminController')
 const categoryController = require('../controllers/catagoryController')
 const brandController = require('../controllers/brandController')
 const productController =require('../controllers/productController')
+const adminUserController=require('../controllers/adminUserController')
 
 
 
@@ -58,7 +59,13 @@ admin_route.post('/category',upload.single('image'),categoryController.verifyCat
  admin_route.post('/addProducts',upload.array('image',3),productController.verifyAddProduct)
  admin_route.get('/products',productController.loadProducts)
  admin_route.patch('/products/:id/changeStatus',productController.updateStatus)
+ admin_route.get('/products/edit/:id',productController.loadEdit)
+ admin_route.put('/products/edit/:id',upload.array('image',3),productController.editProduct)
 
+//user section
+
+admin_route.get('/users',adminUserController.loadUser)
+admin_route.patch('/users/:id/changeStatus',adminUserController.updateStatus)
 
 
  

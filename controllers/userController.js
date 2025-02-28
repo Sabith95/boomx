@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const otpHelper = require('../utils/otpHelper');
 const jwt = require('jsonwebtoken');
 const jwtHelper = require('../utils/jwtHelper');
+const category=require('../models/categoryModel')
+const product = require('../models/productModel')
 
 const loadSignUp = async (req, res) => {
   try {
@@ -68,7 +70,7 @@ const loadLogin = async (req, res) => {
   }
 };
 
-const loadDashboard = (req, res) => {
+const loadDashboard = async(req, res) => {
   const token = req.cookies.token;
   if (!token) {
     return res.status(401).json({ error: 'No token provided' });
@@ -77,7 +79,11 @@ const loadDashboard = (req, res) => {
   if (!decoded) {
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
-  res.render('user/dashboard', { user: decoded.user });
+  const categories =await category.find()
+  const products= await product.find()
+
+
+  res.render('user/home', { user: decoded.user,categories,products });
 };
 
 const userVerifyLogin = async (req, res) => {
@@ -93,7 +99,7 @@ const userVerifyLogin = async (req, res) => {
     }
     const token = jwtHelper.generateToken({ user: { _id: user._id, name: user.name, email: user.email } });
     res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-    res.json({ message: "Login successful!" });
+    res.status(200).json({ message: "Login successful!" });
   } catch (error) {
     console.error("Error during login verification:", error);
     res.status(500).json({ error: "Server error. Please try again later." });

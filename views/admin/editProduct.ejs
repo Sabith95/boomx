@@ -1,0 +1,236 @@
+<%- include("../admin/partials/header") -%>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-primary-900 font-bold mb-6">Edit Product</h1>
+        <form id="editProductForm" action="/admin/products/edit/<%= product._id %>" method="post" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
+                    Product Name
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" name="name" value="<%= product.name %>" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="brand">
+                    Brand
+                </label>
+                <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="brand" name="brand" required>
+                    <option value="">Select a brand</option>
+                    <% brands.forEach(function(brand) { %>
+                        <option value="<%= brand._id %>" <%= product.brand._id.toString() === brand._id.toString() ? 'selected' : '' %>><%= brand.name %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="category">
+                    Category
+                </label>
+                <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="category" name="category" required>
+                    <option value="">Select a category</option>
+                    <% categories.forEach(function(category) { %>
+                        <option value="<%= category._id %>" <%= product.category._id.toString() === category._id.toString() ? 'selected' : '' %>><%= category.name %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
+                    Description
+                </label>
+                <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="description" name="description" rows="4" required><%= product.description %></textarea>
+            </div>
+            <div class="mb-4 flex space-x-4">
+                <div class="w-1/2">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="salePrice">
+                        Sale Price
+                    </label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="salePrice" type="number" name="salePrice" value="<%= product.salePrice %>" step="0.01" required>
+                </div>
+                <div class="w-1/2">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="regularPrice">
+                        Regular Price
+                    </label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="regularPrice" type="number" name="regularPrice" value="<%= product.regularPrice %>" step="0.01" required>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="quantity">
+                    Quantity
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="quantity" type="number" name="quantity" value="<%= product.quantity %>" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="image">
+                  Product Images
+                </label>
+                <div class="flex items-center space-x-4" id="imagePreview">
+                  <% if(product.image && product.image.length > 0) { %>
+                    <% product.image.forEach(function(img, index) { %>
+                      <img src="<%= img %>" alt="Current product image" class="w-24 h-24 object-cover rounded" id="preview-<%= index %>">
+                    <% }); %>
+                    <% for(let i = product.image.length; i < 3; i++) { %>
+                      <div class="w-24 h-24 bg-gray-200 rounded" id="preview-<%= i %>"></div>
+                    <% } %>
+                  <% } else { %>
+                    <div class="w-24 h-24 bg-gray-200 rounded" id="preview-0"></div>
+                    <div class="w-24 h-24 bg-gray-200 rounded" id="preview-1"></div>
+                    <div class="w-24 h-24 bg-gray-200 rounded" id="preview-2"></div>
+                  <% } %>
+                  <input class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="imagesInput" type="file" name="image" accept="image/*" multiple>
+                </div>
+              </div>
+            <div class="flex items-center justify-between">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    Update Product
+                </button>
+                <a href="/admin/products" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Crop Modal -->
+    <div id="cropModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+      <div class="bg-white p-4">
+        <div>
+          <img id="cropImage" src="" alt="Crop image" class="max-w-full max-h-80">
+        </div>
+        <div class="mt-4 flex justify-end space-x-2">
+          <button id="cancelCropBtn" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+          <button id="cropBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Crop</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cropper.js Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script>
+      let cropper;
+      let cropQueue = []; // Queue to process each image sequentially
+      const croppedFiles = [];
+
+      document.getElementById('imagesInput').addEventListener('change', function(e) {
+        const files = e.target.files;
+        cropQueue = [];
+        if (files && files.length > 0) {
+          Array.from(files).slice(0, 3).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+              cropQueue.push({ data: event.target.result, index: index });
+              if(cropQueue.length === 1) {
+                openCropModal(event.target.result, index);
+              }
+            }
+            reader.readAsDataURL(file);
+          });
+        }
+      });
+
+      function processQueue() {
+        if(cropQueue.length > 0) {
+          const nextItem = cropQueue[0];
+          openCropModal(nextItem.data, nextItem.index);
+        }
+      }
+
+      function openCropModal(imageSrc, previewIndex) {
+        const cropModal = document.getElementById('cropModal');
+        const cropImage = document.getElementById('cropImage');
+        cropImage.src = imageSrc;
+        cropModal.classList.remove('hidden');
+        if (cropper) { cropper.destroy(); }
+        cropper = new Cropper(cropImage, {
+          aspectRatio: 1,
+          viewMode: 1,
+        });
+      }
+
+      document.getElementById('cropBtn').addEventListener('click', function() {
+        if (cropper) {
+          const canvas = cropper.getCroppedCanvas({
+            width: 200,
+            height: 200,
+          });
+          canvas.toBlob(function(blob) {
+            const croppedImageUrl = URL.createObjectURL(blob);
+            let previewElement = document.getElementById('preview-' + cropQueue[0].index);
+            if (!previewElement) {
+              previewElement = document.createElement('img');
+              previewElement.id = 'preview-' + cropQueue[0].index;
+              previewElement.className = "w-24 h-24 object-cover rounded";
+              document.getElementById('imagePreview').appendChild(previewElement);
+            }
+            previewElement.src = croppedImageUrl;
+            croppedFiles[cropQueue[0].index] = blob;
+            cropper.destroy();
+            cropper = null;
+            cropQueue.shift();
+            if (cropQueue.length > 0) {
+              processQueue();
+            } else {
+              document.getElementById('cropModal').classList.add('hidden');
+            }
+          });
+        }
+      });
+
+      document.getElementById('cancelCropBtn').addEventListener('click', function() {
+        if (cropper) {
+          cropper.destroy();
+          cropper = null;
+        }
+        document.getElementById('cropModal').classList.add('hidden');
+        if(cropQueue.length > 0) {
+          cropQueue.shift();
+          if(cropQueue.length > 0) {
+            processQueue();
+          }
+        }
+      });
+// editing product
+
+      document.getElementById('editProductForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const form = document.getElementById('editProductForm');
+        const formData = new FormData(form);
+
+        try {
+            const result = await fetch(form.action, {
+                method: 'PUT',
+                body: formData
+            });
+            const data = await result.json();
+            
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.message
+                }).then(() => {
+                    window.location.href = '/admin/products';
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong'
+            });
+        }
+    });
+    </script>
+</body>
+<%- include("../admin/partials/footer") -%>

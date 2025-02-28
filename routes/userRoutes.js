@@ -3,6 +3,7 @@ const user_route = express.Router();
 const passport = require('../config/passport');
 const jwt = require('jsonwebtoken');
 const userController = require('../controllers/userController');
+const userProductController=require('../controllers/userProductController')
 
 // Google login route
 user_route.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -13,7 +14,7 @@ user_route.get('/auth/google/callback', passport.authenticate('google', {
 }), (req, res) => {
     const token = req.user.token;
     res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
-    res.redirect('/user/dashboard');
+    res.redirect('/user/home');
 });
 
 // Google login callback
@@ -30,6 +31,11 @@ user_route.post('/forgot-password/reset-password', userController.resetPassword)
 user_route.get('/forgot-password/otp', userController.loadOtpPage);
 user_route.get('/forgot-password/reset-password', userController.loadResetPasswordPage);
 
-user_route.get('/dashboard', userController.loadDashboard);
+user_route.get('/home', userController.loadDashboard);
+
+//shope
+
+user_route.get('/shope',userProductController.loadShope)
+user_route.get('/view-product/:id',userProductController.loadViewProduct)
 
 module.exports = user_route;

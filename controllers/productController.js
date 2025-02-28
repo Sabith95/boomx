@@ -2,6 +2,7 @@ const product = require('../models/productModel')
 const brand = require('../models/brandModel')
 const category =require('../models/categoryModel')
 
+
 const loadAddProducts = async (req,res)=>{
     try {
         const brands = await brand.find()
@@ -16,10 +17,26 @@ const loadAddProducts = async (req,res)=>{
 
 const loadProducts = async(req,res)=>{
     try {
-        const products = await product.find({})
+
+        const page = parseInt(req.query.page) || 1
+        const limit = 5
+        const skip = (page - 1)* limit
+
+        const querySearch = req.query.search ? req.query.search.trim():""
+        const filter={}
+        if(querySearch){
+            filter.name ={$regex : new RegExp(querySearch,"i")}
+        }
+        const products = await product.find(filter).sort({createdAt:-1}).skip(skip).limit(limit)
         .populate('brand')
         .populate('category')
-        res.render('admin/product',{products})
+       
+
+        const totalItems = await product.countDocuments()
+        const totalPages = await Math.ceil(totalItems/limit)
+
+       
+        res.render('admin/product',{products,search:querySearch,currentPage:page,totalPages})
     } catch (error) {
         console.error("Error",error)
     }
@@ -71,9 +88,77 @@ const updateStatus =async(req,res)=>{
 
 }
 
+const loadEdit = async(req,res)=> {
+    try {
+        const brands = await brand.find()
+        const categories = await category.find()
+
+        const productToEdit = await product.findById(req.params.id)
+        if(!productToEdit){
+             res.status(400).send("Product not found")
+        }
+        res.render('admin/editProduct',{product:productToEdit,brands,categories})
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).send("An error occured")
+    }
+}
+
+const editProduct= async (req,res)=>{
+    try {
+        const {id} = req.params
+        console.log(id);
+        
+        const{name,description,brand,category,salePrice,regularPrice,quantity}= req.body
+        console.log(req.body)
+
+        if(!name || !description){
+            return res.status(400).json({success:false,message:"Name and description are required"})
+        }
+
+        const duplicate = await product.findOne({
+            name:name.trim(),
+            _id:{$ne:id}    
+        })
+        if(duplicate){
+            res.status(400).json({success:false,message:"A product with that name is already exist"})
+        }
+
+        const updatedData={
+            name:name.trim(),
+            description:description.trim(),
+            brand:brand,
+            category:category,
+            salePrice:salePrice.trim(),
+            regularPrice:regularPrice.trim(),
+            quantity:quantity.trim()
+        }
+
+        if(req.file){
+            updatedData.image='/uploads' + req.file.filename
+        }
+        const updatedProduct = await product.findByIdAndUpdate(
+            id,
+            updatedData,
+            {new:true}
+        )
+        if(!updatedProduct){
+            res.status(400).json({success:false,message:"Product not found"})
+        }
+
+        res.status(200).json({success:true,message:"Product updated",product:updatedProduct})
+
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).json({success:false,message:"Something went wrong"})
+    }
+}
+
 module.exports = {
     loadAddProducts,
     loadProducts,
     verifyAddProduct,
-    updateStatus
+    updateStatus,
+    loadEdit,
+    editProduct
 }

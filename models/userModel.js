@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
         unique: true, 
         sparse: true 
     },
+    isListed:{
+        type:Boolean,
+        default:true
+    }
     
 })
 

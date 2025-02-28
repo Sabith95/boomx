@@ -110,55 +110,56 @@
 <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
-  var cropper;
-  var filesToCrop = [];
-  var currentFileIndex = 0;
+ var cropper;
+var filesToCrop = [];
+var currentFileIndex = 0;
 
-  function viewImage(event) {
-      const files = event.target.files;
-      // Limit to 3 images using Toastify for notification
-      if (files.length > 3) {
-          Toastify({
-              text: "Please select only three images.",
-              duration: 3000,
-              gravity: "top",
-              position: "center",
-              backgroundColor: "red",
-          }).showToast();
-          return;
-      }
-      // Clear any previous images from the container
-      document.getElementById('addedImagesContainer').innerHTML = "";
-      filesToCrop = Array.from(files);
-      currentFileIndex = 0;
-      // Start cropping for the first file immediately after selection
-      openCropperForCurrentFile();
-  }
+function viewImage(event) {
+    const files = event.target.files;
+    // Limit to 3 images using Toastify for notification
+    if (files.length > 3) {
+        Toastify({
+            text: "Please select only three images.",
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "red",
+        }).showToast();
+        return;
+    }
+    // Clear any previous images from the container
+    document.getElementById('addedImagesContainer').innerHTML = "";
+    filesToCrop = Array.from(files);
+    currentFileIndex = 0;
+    // Start cropping for the first file immediately after selection
+    openCropperForCurrentFile();
+}
 
-  function openCropperForCurrentFile() {
-      if (currentFileIndex >= filesToCrop.length) {
-          // No more files to crop, hide cropping interface
-          document.querySelector('.image-cropper').classList.add('hidden');
-          return;
-      }
-      const file = filesToCrop[currentFileIndex];
-      const reader = new FileReader();
-      reader.onload = function(e) {
-          const cropperContainer = document.querySelector('.image-cropper');
-          cropperContainer.classList.remove('hidden');
-          const croppedImg = document.getElementById('croppedImg');
-          croppedImg.src = e.target.result;
-          // Destroy any existing cropper instance before creating a new one
-          if (cropper) {
-              cropper.destroy();
-          }
-          cropper = new Cropper(croppedImg, {
-              aspectRatio: 16 / 9,
-              viewMode: 1,
-          });
-      }
-      reader.readAsDataURL(file);
-  }
+function openCropperForCurrentFile() {
+    if (currentFileIndex >= filesToCrop.length) {
+        // No more files to crop, hide cropping interface
+        document.querySelector('.image-cropper').classList.add('hidden');
+        return;
+    }
+    const file = filesToCrop[currentFileIndex];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const cropperContainer = document.querySelector('.image-cropper');
+        cropperContainer.classList.remove('hidden');
+        const croppedImg = document.getElementById('croppedImg');
+        croppedImg.src = e.target.result;
+        // Destroy any existing cropper instance before creating a new one
+        if (cropper) {
+            cropper.destroy();
+        }
+        cropper = new Cropper(croppedImg, {
+            aspectRatio: NaN, // No fixed ratio, admin can crop freely
+            viewMode: 1,
+            autoCropArea: 1  // Initially use the full image (both height and width)
+        });
+    }
+    reader.readAsDataURL(file);
+}
 
   document.getElementById('saveButton').addEventListener('click', function(){
       if (cropper) {
