@@ -1,0 +1,170 @@
+<%- include('../user/partials/header') %>
+<%- include('../user/partials/head') %>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+
+      <!-- Search, Sort & Filter Section (single line) -->
+        <div class="flex flex-col md:flex-row items-center gap-4 mb-6">
+            <!-- Search Bar (Left) -->
+            <div class="w-full md:w-1/2">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        placeholder="Search products..."
+                        class="w-full py-2 px-4 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                        value=""
+                    >
+                    <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-purple-600">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+    
+    <!-- Sort & Filter Options (Right) -->
+    <div class="w-full md:w-1/2 flex items-center justify-end space-x-3">
+        <!-- Sort Dropdown -->
+        <form method="GET" action="/user/shope">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-gray-600 whitespace-nowrap">Sort by:</span>
+              <select name="sort" class="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" onchange="this.form.submit()">
+                <option value="">Featured</option>
+                <option value="priceAsc">Price: Low to High</option>
+                <option value="priceDesc">Price: High to Low</option>
+                <option value="nameAsc">Name: A to Z</option>
+                <option value="nameDesc">Name: Z to A</option>
+                <option value="newest">Newest First</option>
+              </select>
+            </div>
+          </form>
+          
+        
+        <!-- Filter Button -->
+        <div class="relative">
+            <button id="filter-button" class="bg-white py-1 px-3 rounded-lg border border-gray-300 font-medium text-sm flex items-center space-x-1">
+                <span>Filter</span>
+                <i class="fas fa-chevron-down transition-transform duration-300" id="filter-icon"></i>
+            </button>
+            <div id="filter-dropdown" class="absolute right-0 z-10 mt-2 w-64 bg-white p-4 rounded-lg shadow-md hidden">
+                <!-- Category Filter Dropdown -->
+                <div class="mb-3">
+                    <label for="filter-category" class="block text-sm font-medium text-gray-700">Category</label>
+                    <select id="filter-category" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                        <option value="">All Categories</option>
+                        <% categories.forEach(cat => { %>
+                        <option><%= cat.name %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <!-- Brand Filter Dropdown -->
+                <div class="mb-3">
+                    <label for="filter-brand" class="block text-sm font-medium text-gray-700">Brand</label>
+                    <select id="filter-brand" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                        <option value="">All Brands</option>                                
+                        <% brands.forEach(brand => { %>
+                        <option><%= brand.name %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <!-- Price Range Filter -->
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700">Price Range</label>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <input type="number" placeholder="Min" class="w-1/2 border rounded px-2 py-1 focus:outline-none">
+                        <input type="number" placeholder="Max" class="w-1/2 border rounded px-2 py-1 focus:outline-none">
+                    </div>
+                </div>
+                <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md text-sm">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <% products.forEach(product => { %>
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                <a href="/user/view-product/<%= product.id %>">
+                    <div class="relative h-56 flex items-center justify-center bg-gray-50 p-4">
+                        <img src="<%= product.image[0] %>" alt="<%= product.name %>" class="max-h-full object-contain">
+                        <button class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-600 hover:text-red-500">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="p-5">
+                        <div class="text-sm text-gray-500 mb-1"><%= product.brand.name %></div>
+                        <h3 class="font-semibold text-xl mb-2"><%= product.name %></h3>
+                        <div class="flex items-center mb-3">
+                            <div class="flex text-yellow-400">
+                                <% for(let i = 1; i <= 5; i++) { %>
+                                    <% if(i <= Math.floor(product.rating)) { %>
+                                        <i class="fas fa-star"></i>
+                                    <% } else if(i <= product.rating) { %>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    <% } else { %>
+                                        <i class="far fa-star"></i>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">(<%= product.rating %>)</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-2xl">$<%= product.salePrice %></span>
+                            <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full text-sm">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <% }); %>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-8 flex justify-center">
+            <div class="flex space-x-1">
+                <a href="#" class="px-3 py-1 border rounded text-gray-600 hover:bg-purple-600 hover:text-white"><i class="fas fa-chevron-left"></i></a>
+                <% [1, 2, 3, 4, 5].forEach(page => { %>
+                <a href="#" class="px-3 py-1 border rounded <%= page === 1 ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-purple-600 hover:text-white' %>"><%= page %></a>
+                <% }); %>
+                <a href="#" class="px-3 py-1 border rounded text-gray-600 hover:bg-purple-600 hover:text-white"><i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript for interactions -->
+    <script>
+        // Filter dropdown toggle
+        const filterButton = document.getElementById('filter-button');
+        const filterDropdown = document.getElementById('filter-dropdown');
+        const filterIcon = document.getElementById('filter-icon');
+        
+        filterButton.addEventListener('click', function() {
+            filterDropdown.classList.toggle('hidden');
+            filterIcon.classList.toggle('rotate-180');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!filterButton.contains(event.target) && !filterDropdown.contains(event.target)) {
+                filterDropdown.classList.add('hidden');
+                filterIcon.classList.remove('rotate-180');
+            }
+        });
+
+        // Price range input functionality
+        const rangeInput = document.querySelector('input[type="range"]');
+        const minPriceDisplay = document.getElementById('min-price');
+        const maxPriceDisplay = document.getElementById('max-price');
+        const minPriceInput = document.querySelector('input[type="number"][placeholder="Min"]');
+        const maxPriceInput = document.querySelector('input[type="number"][placeholder="Max"]');
+
+        if(rangeInput){
+          rangeInput.addEventListener('input', function() {
+              const value = this.value;
+              if(maxPriceDisplay) maxPriceDisplay.textContent = value;
+              if(maxPriceInput) maxPriceInput.value = value;
+          });
+        }
+    </script>
+<%- include('../user/partials/foot') %>
+<%- include('../user/partials/footer') %>

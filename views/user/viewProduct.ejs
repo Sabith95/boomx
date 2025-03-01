@@ -1,0 +1,278 @@
+<%- include('../user/partials/header') %>
+<%- include('../user/partials/head') %>
+<!-- Main Content -->
+<main class="container mx-auto px-4 py-8">
+    <!-- Breadcrumb Navigation -->
+    <nav class="flex mb-6 text-sm">
+        <ol class="flex items-center space-x-2">
+            <li><a href="/user/home" class="text-gray-600 hover:text-purple-600">Home</a></li>
+            <li><span class="text-gray-400 mx-2">/</span></li>
+            <li><a href="/user/shope" class="text-gray-600 hover:text-purple-600">Shop</a></li>
+            <li><span class="text-gray-400 mx-2">/</span></li>
+            <li class="text-purple-600 font-medium"><%= products.name %></li>
+        </ol>
+    </nav>
+
+    <!-- products Detail Section -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden p-6 mb-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- products Images Section -->
+            <div class="w-full lg:w-2/5">
+                <!-- Main Image -->
+                <div class="bg-gray-50 rounded-xl p-4 mb-4 h-80 flex items-center justify-center">
+                    <img id="main-products-image" src="<%= products.image[0] %>" alt="<%= products.name %>" class="max-h-full max-w-full object-contain">
+                </div>
+                <!-- Thumbnail Images -->
+                <div class="grid grid-cols-5 gap-2">
+                    <% products.image.forEach((img, index) => { %>
+                    <div class="bg-gray-50 rounded-lg p-2 h-16 flex items-center justify-center cursor-pointer hover:border-2 hover:border-purple-500 <%= index === 0 ? 'border-2 border-purple-500' : '' %>" 
+                         onclick="changeMainImage('<%= img %>', this)">
+                        <img src="<%= img %>" alt="<%= products.name %> thumbnail" class="max-h-full max-w-full object-contain">
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+
+            <!-- products Information Section -->
+            <div class="w-full lg:w-3/5">
+                <!-- Brand and Title -->
+                <div class="mb-4">
+                    <div class="text-sm text-gray-500 mb-1"><%= products.brand.name %></div>
+                    <h1 class="text-3xl font-bold mb-2"><%= products.name %></h1>
+                    <div class="text-sm text-gray-500 mb-1">
+                        <%= products.category.name %>
+                      </div>
+                    <!-- Rating -->
+                    <div class="flex items-center">
+                        <div class="flex text-yellow-400">
+                            <% for(let i = 1; i <= 5; i++) { %>
+                                <% if(i <= Math.floor(products.rating)) { %>
+                                    <i class="fas fa-star"></i>
+                                <% } else if(i <= products.rating) { %>
+                                    <i class="fas fa-star-half-alt"></i>
+                                <% } else { %>
+                                    <i class="far fa-star"></i>
+                                <% } %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Section -->
+                <div class="mb-6">
+                    <% if (products.regularPrice > products.salePrice) { %>
+                    <div class="flex items-center">
+                        <span class="text-3xl font-bold">$<%= products.salePrice %></span>
+                        <span class="text-lg text-gray-500 line-through ml-3">$<%= products.regularPrice %></span>
+                        <span class="ml-3 bg-red-100 text-red-700 px-2 py-1 rounded text-sm font-medium">
+                            <%= Math.round((1 - products.salePrice / products.regularPrice) * 100) %>% OFF
+                        </span>
+                    </div>
+                    <% } else { %>
+                    <span class="text-3xl font-bold">$<%= products.salePrice %></span>
+                    <% } %>
+                </div>
+
+                <!-- products Description -->
+                <div class="mb-6">
+                    <h2 class="text-lg font-semibold mb-2">Description</h2>
+                    <p class="text-gray-700"><%= products.description %></p>
+                </div>
+
+                <!-- Stock Availability -->
+                <div class="mb-6">
+                    <div class="flex items-center">
+                        <% if (products.quantity > 0) { %>
+                            <span class="text-green-600 font-medium flex items-center">
+                                <i class="fas fa-check-circle mr-2"></i> In Stock
+                                <span class="text-gray-600 ml-2">(<%= products.quantity %> available)</span>
+                            </span>
+                        <% } else { %>
+                            <span class="text-red-600 font-medium flex items-center">
+                                <i class="fas fa-times-circle mr-2"></i> Out of Stock
+                            </span>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                    <button 
+                        class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-md font-medium flex items-center justify-center <%= products.stock === 0 ? 'opacity-50 cursor-not-allowed' : '' %>"
+                        <%= products.stock === 0 ? 'disabled' : '' %>
+                    >
+                        <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                    </button>
+                    <button 
+                        class="flex-1 bg-black hover:bg-gray-900 text-white py-3 px-6 rounded-md font-medium flex items-center justify-center <%= products.stock === 0 ? 'opacity-50 cursor-not-allowed' : '' %>"
+                        <%= products.stock === 0 ? 'disabled' : '' %>
+                    >
+                        <i class="fas fa-bolt mr-2"></i> Buy Now
+                    </button>
+                    <button class="w-12 h-12 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-100 text-gray-600 hover:text-red-500">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- products Tabs Section -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+        <div class="border-b border-gray-200">
+            <div class="flex overflow-x-auto">
+                <button class="tab-button active py-4 px-6 font-medium" data-tab="description">Description</button>
+                <button class="tab-button py-4 px-6 font-medium" data-tab="specifications">Specifications</button>
+            </div>
+        </div>
+        <div class="p-6">
+            <!-- Description Tab -->
+            <div id="description-tab" class="tab-content">
+                <div class="prose max-w-none">
+                    <%- products.description %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Related Products Section -->
+<div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+    <div class="p-6">
+        <h2 class="text-2xl font-bold mb-6">Related Products</h2>
+        
+        <!-- Products Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <% relatedProducts.forEach(products => { %>
+            <div class="bg-white rounded-xl transition-transform hover:scale-105">
+                <a href="/user/view-product/<%= products._id %>" class="block">
+                    <!-- Product Image -->
+                    <div class="h-48 bg-gray-50 rounded-xl p-4 mb-3 flex items-center justify-center">
+                        <img src="<%= products.image[0] %>" alt="<%= products.name %>" class="max-h-full max-w-full object-contain">
+                    </div>
+                    
+                    <!-- Product Info -->
+                    <div class="px-1">
+                        <!-- Brand -->
+                        <div class="text-xs text-gray-500 mb-1"><%= products.brand.name %></div>
+                        
+                        <!-- Product Name -->
+                        <h3 class="font-medium text-sm mb-1 line-clamp-2 h-10"><%= products.name %></h3>
+                        
+                        <!-- Rating -->
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400 text-xs">
+                                <% for(let i = 1; i <= 5; i++) { %>
+                                    <% if(i <= Math.floor(products.rating)) { %>
+                                        <i class="fas fa-star"></i>
+                                    <% } else if(i <= products.rating) { %>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    <% } else { %>
+                                        <i class="far fa-star"></i>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                            <span class="text-xs text-gray-500 ml-1">(<%= products.numReviews %>)</span>
+                        </div>
+                        
+                        <!-- Price -->
+                        <div class="flex items-center mb-3">
+                            <% if (products.regularPrice > products.salePrice) { %>
+                            <span class="font-bold">$<%= products.salePrice %></span>
+                            <span class="text-xs text-gray-500 line-through ml-2">$<%= products.regularPrice %></span>
+                            <span class="ml-2 bg-red-100 text-red-700 px-1.5 py-0.5 rounded text-xs">
+                                <%= Math.round((1 - products.salePrice / products.regularPrice) * 100) %>% OFF
+                            </span>
+                            <% } else { %>
+                            <span class="font-bold">$<%= products.salePrice %></span>
+                            <% } %>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <% }); %>
+        </div>
+    </div>
+</div>
+</main>
+
+<!-- JavaScript -->
+<script>
+    // Image gallery functionality
+    function changeMainImage(src, thumbnail) {
+        document.getElementById('main-products-image').src = src;
+        document.querySelectorAll('.bg-gray-50.rounded-lg').forEach(el => {
+            el.classList.remove('border-2', 'border-purple-500');
+        });
+        thumbnail.classList.add('border-2', 'border-purple-500');
+    }
+    
+    // Quantity selector functionality
+    function incrementQuantity(max) {
+        const input = document.getElementById('quantity');
+        const currentValue = parseInt(input.value);
+        if (currentValue < max) {
+            input.value = currentValue + 1;
+        }
+    }
+    
+    function decrementQuantity() {
+        const input = document.getElementById('quantity');
+        const currentValue = parseInt(input.value);
+        if (currentValue > 1) {
+            input.value = currentValue - 1;
+        }
+    }
+    
+    // Tabs functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'text-purple-600', 'border-b-2', 'border-purple-600');
+            });
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Add active class to clicked tab
+            button.classList.add('active', 'text-purple-600', 'border-b-2', 'border-purple-600');
+            
+            // Show corresponding tab content
+            const tabId = button.getAttribute('data-tab');
+            document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+        });
+    });
+    
+    // Initialize with the first tab active
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelector('.tab-button.active').click();
+    });
+</script>
+
+<style>
+    /* Custom styles for tabs */
+    .tab-button {
+        position: relative;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+    
+    .tab-button.active {
+        color: #9333ea;
+        border-bottom: 2px solid #9333ea;
+    }
+    
+    /* Quantity input - hide spinner */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+
+<%- include('../user/partials/foot') %>
+<%- include('../user/partials/footer') %>

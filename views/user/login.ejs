@@ -99,7 +99,7 @@
         const data = await response.json();
         if (response.ok) {
           swal("Success", data.message, "success").then(() => {
-            window.location.href = "/user/dashboard";
+            window.location.href = "/user/home";
           });
         } else {
           swal("Error", data.error || "Login failed.", "error");

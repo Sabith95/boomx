@@ -1,0 +1,78 @@
+<!-- Footer -->
+<footer class="bg-gray-800 text-gray-300 pt-12 pb-6">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-white text-lg font-medium mb-4"></h3>
+                <p class="mb-4 text-sm">We provide high-quality products at the best prices. Shop with confidence and enjoy our premium customer service.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-pinterest"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-white text-lg font-medium mb-4">Quick Links</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="/" class="hover:text-white">Home</a></li>
+                    <li><a href="/shop" class="hover:text-white">Shop</a></li>
+                    <li><a href="/about" class="hover:text-white">About Us</a></li>
+                    <li><a href="/contact" class="hover:text-white">Contact</a></li>
+                    <li><a href="/blog" class="hover:text-white">Blog</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white text-lg font-medium mb-4">Customer Service</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="/faq" class="hover:text-white">FAQ</a></li>
+                    <li><a href="/shipping" class="hover:text-white">Shipping Policy</a></li>
+                    <li><a href="/returns" class="hover:text-white">Returns & Refunds</a></li>
+                    <li><a href="/privacy" class="hover:text-white">Privacy Policy</a></li>
+                    <li><a href="/terms" class="hover:text-white">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white text-lg font-medium mb-4">Contact Us</h4>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-start space-x-2">
+                        <i class="fa-solid fa-location-dot mt-1"></i>
+                        <span>123 Commerce St, City, Country</span>
+                    </li>
+                    <li class="flex items-start space-x-2">
+                        <i class="fa-solid fa-phone mt-1"></i>
+                        <span>+1 (555) 123-4567</span>
+                    </li>
+                    <li class="flex items-start space-x-2">
+                        <i class="fa-solid fa-envelope mt-1"></i>
+                        <span>info@.com</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="mt-8 pt-6 border-t border-gray-700 text-center text-sm">
+            <p>&copy; <%= new Date().getFullYear() %> . All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- JavaScript for mobile menu toggle -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+            // Toggle icon between bars and X
+            const icon = mobileMenuButton.querySelector('i');
+            if (icon.classList.contains('fa-bars')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
+    });
+</script>
