@@ -59,7 +59,9 @@
   <!-- Include SweetAlert from a CDN -->
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script>
-    // Login form submission (unchanged)
+
+    
+    // Login form submission 
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault(); 
       document.getElementById('emailError').innerText = '';
@@ -165,6 +167,15 @@
         }
       });
     });
+
+  //   window.addEventListener('pageshow', function(event) {
+  //   if (event.persisted) {
+  //     window.location.reload();
+  //   }
+  // });
+    
+
+    
   </script>
   
-</body>
+  <%- include('../layouts/footer') %> 

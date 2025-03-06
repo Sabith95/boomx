@@ -37,12 +37,11 @@ const verifyOtp = async (req, res) => {
   console.log("received otp ", otp);
   try {
     const decoded = otpHelper.verifyOtpToken(token, otp);
-    console.log("decoded data", decoded);
     if (!decoded) {
       return res.status(400).json({ error: "Invalid or expired Otp" });
     }
     const hashPassword = await bcrypt.hash(decoded.password, 10);
-    console.log("this is hashed password", hashPassword);
+   
     
     // creating new user
     const newUser = new User({
@@ -51,10 +50,10 @@ const verifyOtp = async (req, res) => {
       mobile: decoded.mobile,
       password: hashPassword,
     });
-    console.log("new user", newUser);
+   
     
     await newUser.save();
-    console.log("saved");
+    
     
     return res.json({ message: "Account created successfully.Redirecting to login" });
   } catch (error) {
@@ -70,15 +69,27 @@ const loadLogin = async (req, res) => {
   }
 };
 
+const logoutUser = async(req,res)=>{
+  try {
+    res.clearCookie('token')
+    res.render('user/login')
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send('Server error during logout');
+  }
+}
+
 const loadDashboard = async(req, res) => {
   const token = req.cookies.token;
   if (!token) {
-    return res.status(401).json({ error: 'No token provided' });
+    return res.redirect('/user/login')
   }
   const decoded = jwtHelper.verifyToken(token);
   if (!decoded) {
-    return res.status(401).json({ error: 'Invalid or expired token' });
+    return res.redirect('/user/login')
   }
+
+  
   const categories =await category.find()
   const products= await product.find()
 
@@ -87,18 +98,24 @@ const loadDashboard = async(req, res) => {
 };
 
 const userVerifyLogin = async (req, res) => {
+
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ error: "User does not exist. Please sign up first." });
     }
+    if(!user.isListed){
+      return res.status(403).json({error:"Your account has been blocked by admin"})
+    }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ error: "Invalid email or password." });
     }
     const token = jwtHelper.generateToken({ user: { _id: user._id, name: user.name, email: user.email } });
+
     res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+
     res.status(200).json({ message: "Login successful!" });
   } catch (error) {
     console.error("Error during login verification:", error);
@@ -203,5 +220,6 @@ module.exports = {
   forgotPasswordVerifyOtp,
   resetPassword,
   loadOtpPage,
-  loadResetPasswordPage
+  loadResetPasswordPage,
+  logoutUser
 };

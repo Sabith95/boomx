@@ -18,8 +18,8 @@
             <h2 class="text-3xl md:text-5xl font-bold mb-4 text-white">Welcome to BoomX</h2>
             <p class="text-lg md:text-xl mb-8 text-white/90">Discover our latest collection with amazing offers.</p>
             <div class="flex space-x-4">
-                <a href="/user//shope" class="inline-block bg-white text-purple-700 py-3 px-8 rounded-full font-medium hover:bg-purple-100 transition-colors shadow-lg">Shop Now</a>
-                <a href="/categories" class="inline-block border-2 border-white text-white py-3 px-8 rounded-full font-medium hover:bg-white/10 transition-colors">Explore</a>
+                <a href="/user/shope" class="inline-block bg-white text-purple-700 py-3 px-8 rounded-full font-medium hover:bg-purple-100 transition-colors shadow-lg">Shop Now</a>
+                <a href="/user/shope" class="inline-block border-2 border-white text-white py-3 px-8 rounded-full font-medium hover:bg-white/10 transition-colors">Explore</a>
             </div>
         </div>
     </div>
@@ -31,7 +31,7 @@
       <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">Shop By Category</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <% categories.forEach(function(cat) { %>
-          <a href="/categories/<%= cat.slug %>" class="group">
+          <a href="/user/categories/<%= cat.id %>" class="group">
             <div class="flex flex-col items-center">
               <div class="w-32 h-32 md:w-40 md:h-40 rounded-full shadow-md overflow-hidden group-hover:shadow-lg transition-shadow">
                 <img src="<%= cat.image %>" alt="<%= cat.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">

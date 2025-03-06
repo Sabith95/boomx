@@ -49,8 +49,6 @@ try{
     
     
     const decoded = jwt.verify(token,OTP_SECRET)
-    console.log("decoded token data ",decoded);
-    console.log("decoded otp",decoded.otp,typeof decoded.otp);
     return decoded.otp === userOtp ? decoded : null
     
 

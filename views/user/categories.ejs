@@ -1,0 +1,111 @@
+<%- include('../user/partials/header') %>
+<%- include('../user/partials/head') %>
+
+<!-- Main Container -->
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Products</h1>
+  
+  <!-- Products Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <% products.forEach(product => { %>
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+      <a href="/user/view-product/<%= product.id %>" class="block h-full">
+        <div class="relative h-56 flex items-center justify-center bg-gray-50 p-4">
+          <img 
+            src="<%= product.image[0] %>" 
+            alt="<%= product.name %>" 
+            class="max-h-full max-w-full object-contain"
+            onerror="this.onerror=null; this.src='/images/placeholder.png';"
+          >
+          <button 
+            class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-gray-600 hover:text-red-500 transition-colors"
+            aria-label="Add to favorites"
+          >
+            <i class="fas fa-heart"></i>
+          </button>
+        </div>
+        <div class="p-5 flex flex-col h-48">
+          <div class="text-sm text-gray-500 mb-1"><%= product.brand.name %></div>
+          <h3 class="font-semibold text-lg mb-2 line-clamp-2 h-14"><%= product.name %></h3>
+          <div class="flex items-center mb-3">
+            <div class="flex text-yellow-400">
+              <% for(let i = 1; i <= 5; i++) { %>
+                <% if(i <= Math.floor(product.rating)) { %>
+                  <i class="fas fa-star"></i>
+                <% } else if(i <= product.rating) { %>
+                  <i class="fas fa-star-half-alt"></i>
+                <% } else { %>
+                  <i class="far fa-star"></i>
+                <% } %>
+              <% } %>
+            </div>
+            <span class="text-gray-600 text-sm ml-2">(<%= product.rating %>)</span>
+          </div>
+          <div class="flex justify-between items-center mt-auto">
+            <span class="font-bold text-2xl">$<%= product.salePrice %></span>
+            <button 
+              class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+              aria-label="Add to cart"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </a>
+    </div>
+    <% }); %>
+  </div>
+
+  <!-- Empty State (if no products) -->
+  <% if (products.length === 0) { %>
+  <div class="flex flex-col items-center justify-center py-12">
+    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+    </svg>
+    <h2 class="mt-4 text-lg font-medium text-gray-900">No products found</h2>
+    <p class="mt-2 text-sm text-gray-500">Try adjusting your search or filter to find what you're looking for.</p>
+  </div>
+  <% } %>
+
+   <!-- Pagination -->
+   <div class="mt-6 flex justify-center">
+    <nav class="flex space-x-2">
+    <!-- Previous button-->
+    <% if(currentPage > 1) { %>
+      <a href="/user/categories?page=<%= currentPage - 1 %>" 
+        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+            &laquo;prev
+      </a>
+      <% } else { %>
+        <span class="px-4 py-2 text-gray-400 bg-gray-200 rounded cursor-not-allowed">
+          &laquo; Prev
+        </span>
+      <% } %>
+
+       <!-- Page Numbers -->
+       <% for (let i = 1; i <= totalPages; i++) { %>
+        <a href="/user/categories?page=<%= i %>" 
+           class="px-4 py-2 rounded <%= i === currentPage ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+          <%= i %>
+        </a>
+      <% } %>
+
+      <!-- Next Button -->
+      <% if (currentPage < totalPages) { %>
+        <a href="/user/categories?page=<%= currentPage + 1 %>" 
+           class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+          &raquo;
+        </a>
+      <% } else { %>
+        <span class="px-4 py-2 text-gray-400 bg-gray-200 rounded cursor-not-allowed">
+          &raquo;
+        </span>
+      <% } %>
+    </nav>
+  </div>
+  
+  
+</div>
+
+<%- include('../user/partials/foot') %>    
+<%- include('../user/partials/footer') %>

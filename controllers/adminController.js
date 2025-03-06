@@ -1,5 +1,8 @@
 const Admin = require('../models/adminModel')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken');
+const jwtHelper = require('../utils/jwtHelper');
+const adminAuth=require('../middlewares/adminAuth')
 
 
 const loadLogin = async(req,res)=>{
@@ -25,6 +28,18 @@ const verifyLogin=async(req,res)=>{
             return res.status(401).json({message:"Invalid username or password"})
         }
 
+        const token = jwtHelper.generateToken({
+            admin:{
+                _id:admin._id,
+                email:admin.email,
+            },
+        })
+
+        res.cookie('token',token,{
+            httpOnly: true, 
+            secure: process.env.NODE_ENV === 'production' 
+        })
+
         res.status(200).json({message:"Login Success"})
 
         }
@@ -36,8 +51,28 @@ const verifyLogin=async(req,res)=>{
 
     
     const loadDashboard= async(req,res)=>{
+
+         const token = req.cookies.token;
+          if (!token) {
+            return res.redirect('/admin/login')
+          }
+          const decoded = jwtHelper.verifyToken(token);
+          if (!decoded) {
+            return res.redirect('/admin/login')
+          }
+
         res.render("admin/dashboard")
     }
+
+    const logoutAdmin = async(req,res)=>{
+        try {
+          res.clearCookie('token')
+          res.render('admin/login')
+        } catch (error) {
+          console.log(error.message);
+          res.status(500).send('Server error during logout');
+        }
+      }
 
 
     
@@ -47,7 +82,8 @@ const verifyLogin=async(req,res)=>{
 module.exports={
     loadLogin,
     verifyLogin,
-    loadDashboard
+    loadDashboard,
+    logoutAdmin
 }
 
 
