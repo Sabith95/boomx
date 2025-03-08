@@ -5,6 +5,7 @@ const connectDb = require('./config/database');
 const path = require('path');
 const expressSession = require('express-session');
 const cookieParser = require('cookie-parser');
+const jwtHelper = require('./utils/jwtHelper');
 
 const app = express();
 
@@ -14,12 +15,14 @@ connectDb();
 //  Set up view engine & static files
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.static('public'));
 
+// app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 //  Middleware for parsing request data
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+
 
 //  Session Middleware (Must be before Passport)
 app.use(expressSession({
@@ -33,7 +36,34 @@ require('./config/passport');
 app.use(passport.initialize());
 app.use(passport.session());  
 
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); 
+  res.setHeader('Expires', '0');
+  res.setHeader('Pragma', 'no-cache'); 
+  next();
+});
+
+//for header correction
+
+app.use((req, res, next) => {
+    const token = req.cookies.token;
+    if (token) {
+      try {
+        const decoded = jwtHelper.verifyToken(token);
+        res.locals.user = decoded.user;
+      } catch (err) {
+        res.locals.user = null;
+      }
+    } else {
+      res.locals.user = null;
+    }
+    next();
+  });
+
 //  Routes
+
+const landingRoute = require('./routes/landingRoutes')
+app.use('/',landingRoute)
 const userRoute = require('./routes/userRoutes');
 app.use('/user', userRoute);
 
@@ -45,3 +75,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+

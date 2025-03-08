@@ -1,9 +1,17 @@
 const category = require('../models/categoryModel');
 // const { search } = require('../routes/adminRoutes');
+const jwtHelper = require('../utils/jwtHelper');
+
 
 const loadCategories = async (req, res) => {
 
     try {
+
+      const token = req.cookies.adminToken;
+      if (!token || !jwtHelper.verifyToken(token)) {
+          return res.redirect('/admin/login');
+      }
+
       const page =parseInt(req.query.page) || 1
       const limit = 5
       const skip = (page-1)*limit
@@ -27,6 +35,12 @@ const loadCategories = async (req, res) => {
 
 const verifyCategory = async (req, res) => {
     try {
+
+      const token = req.cookies.adminToken;
+      if (!token || !jwtHelper.verifyToken(token)) {
+          return res.status(401).json({ success: false, message: "Unauthorized access" });
+      }
+
         const { name, description } = req.body;
         const existingCategory= await category.findOne({name})
         if(existingCategory){
@@ -47,6 +61,12 @@ const verifyCategory = async (req, res) => {
 
 const unlistCategory= async(req,res)=>{
   try{
+
+    const token = req.cookies.adminToken;
+    if (!token || !jwtHelper.verifyToken(token)) {
+        return res.redirect('/admin/login');
+    }
+
     const categoryId = req.params.id
     const updatedCategory = await category.findByIdAndUpdate(
         categoryId,
@@ -67,6 +87,12 @@ const unlistCategory= async(req,res)=>{
 
 const listCategory = async(req,res)=>{
     try{
+
+      const token = req.cookies.adminToken;
+      if (!token || !jwtHelper.verifyToken(token)) {
+          return res.redirect('/admin/login');
+      }
+
         const categoryId =req.params.id
         const updatedCategory= await category.findByIdAndUpdate(
             categoryId,
@@ -86,6 +112,12 @@ const listCategory = async(req,res)=>{
 
 
 const editCategory = async (req, res) => {
+
+  const token = req.cookies.adminToken;
+  if (!token || !jwtHelper.verifyToken(token)) {
+      return res.status(401).json({ success: false, message: "Unauthorized access" });
+  }
+  
     const { id } = req.params;
     const { name, description } = req.body;
   

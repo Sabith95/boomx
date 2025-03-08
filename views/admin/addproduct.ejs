@@ -3,8 +3,25 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        /* Additional styles to ensure cropper is visible */
+        .image-cropper {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        #croppedImg {
+            display: block;
+            max-width: 100%;
+        }
+        .cropper-container {
+            max-width: 100% !important;
+        }
+    </style>
 </head>
 
 <div class="p-6 bg-gray-100">
@@ -15,13 +32,13 @@
            <form id="addProductsForm" method="post" action="/admin/addProducts" enctype="multipart/form-data">
                <div class="mb-4">
                    <label for="product_name" class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                   <input type="text" placeholder="Type here" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md" id="product_name">
+                   <input type="text" placeholder="Type here" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md" id="product_name" required>
                    <div id="productName-error" class="text-red-500 text-sm mt-1"></div>
                </div>
                
                <div class="mb-4">
                    <label class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
-                   <select class="w-full px-3 py-2 border border-gray-300 rounded-md" name="brand">
+                   <select class="w-full px-3 py-2 border border-gray-300 rounded-md" name="brand" required>
                        <option value="">Select Brand</option>
                        <% brands.forEach(function(brand) { %>
                         <option value="<%= brand._id %>"><%= brand.name %></option>
@@ -33,43 +50,31 @@
                
                <div class="mb-4">
                    <label class="block text-sm font-medium text-gray-700 mb-1">Full description</label>
-                   <textarea placeholder="Type here" id="descriptionid" name="description" class="w-full px-3 py-2 border border-gray-300 rounded-md" rows="4"></textarea>
+                   <textarea placeholder="Type here" id="descriptionid" name="description" class="w-full px-3 py-2 border border-gray-300 rounded-md" rows="4" required></textarea>
                    <div id="description-error" class="text-red-500 text-sm mt-1"></div>
                </div>
                
                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                    <div>
                        <label class="block text-sm font-medium text-gray-700 mb-1">Regular price</label>
-                       <input placeholder="$" name="regularPrice" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                       <input placeholder="₹" name="regularPrice" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
                        <div id="regularPrice-error" class="text-red-500 text-sm mt-1"></div>
                    </div>
                    <div>
                        <label class="block text-sm font-medium text-gray-700 mb-1">Sale price</label>
-                       <input placeholder="$" name="salePrice" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                       <input placeholder="₹" name="salePrice" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
                        <div id="salePrice-error" class="text-red-500 text-sm mt-1"></div>
                    </div>
                    <div>
                        <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                       <input placeholder="" name="quantity" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                       <input placeholder="" name="quantity" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
                        <div id="quantity-error" class="text-red-500 text-sm mt-1"></div>
                    </div>
                </div>
                
-               <!-- <div class="mb-4">
-                   <label class="block text-sm font-medium text-gray-700 mb-1">Variants</label>
-                   <div class="space-y-2" id="variants-container">
-                       <div class="flex gap-4">
-                           <input type="text" placeholder="Size" name="variants[]" class="w-1/2 px-3 py-2 border border-gray-300 rounded-md">
-                           <input type="text" placeholder="Color" name="variants[]" class="w-1/2 px-3 py-2 border border-gray-300 rounded-md">
-                       </div>
-                   </div>
-                   <button type="button" onclick="addVariant()" class="mt-2 px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">+ Add Variant</button>
-                   <div id="variants-error" class="text-red-500 text-sm mt-1"></div>
-               </div> -->
-               
                <div class="mb-4">
                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                   <select class="w-full px-3 py-2 border border-gray-300 rounded-md" name="category">
+                   <select class="w-full px-3 py-2 border border-gray-300 rounded-md" name="category" required>
                        <option value="">Select Category</option>
                        <% categories.forEach(function(cat) { %>
                         <option value="<%= cat._id %>"><%= cat.name %></option>
@@ -83,19 +88,34 @@
                        <h4 class="text-lg font-semibold">Product Image</h4>
                    </div>
                    <div class="p-4">
-                       <div id="addedImagesContainer" class="flex overflow-x-auto space-x-4 mb-4"></div>
+                       <div id="addedImagesContainer" class="flex flex-wrap gap-4 mb-4"></div>
                        <div class="space-y-2">
-                          
-                           <input class="w-full px-3 py-2 border border-gray-300 rounded-md" type="file" name="image" id="imageInput"
+                           <label class="block text-sm font-medium text-gray-700 mb-1">
+                               Select up to 3 images (you'll be able to crop each one)
+                           </label>
+                           <input class="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                               type="file" name="image" id="imageInput"
                                accept="image/png, image/jpeg, image/jpg" multiple
-                               onchange="viewImage(event)">
+                               required>
                        </div>
-                        <!-- Cropping interface -->
-                    <div class="image-cropper items-center hidden" style="width: 600px; height: 400px;">
-                        <img src="/placeholder.svg" id="croppedImg" alt="" class="max-w-full max-h-full">
-                         <button type="button" id="saveButton" class="mt-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">Save</button>
-                    </div>
-                     <div id="image-error" class="text-red-500 text-sm mt-2"></div>
+                       
+                       <!-- Cropping interface -->
+                       <div id="cropperContainer" class="image-cropper hidden">
+                           <div class="text-center mb-3">
+                               <span class="font-medium">Crop Image</span>
+                               <span id="cropperIndex" class="ml-2 text-gray-500"></span>
+                           </div>
+                           <div style="max-width: 500px; margin: 0 auto;">
+                               <img id="croppedImg" src="" alt="Image to crop">
+                           </div>
+                           <div class="flex justify-center mt-4">
+                               <button type="button" id="saveButton" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
+                                   Save Crop
+                               </button>
+                           </div>
+                       </div>
+                       
+                       <div id="image-error" class="text-red-500 text-sm mt-2"></div>
                    </div>
                </div>
                
@@ -107,164 +127,288 @@
    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
- var cropper;
-var filesToCrop = [];
-var currentFileIndex = 0;
-
-function viewImage(event) {
-    const files = event.target.files;
-    // Limit to 3 images using Toastify for notification
-    if (files.length > 3) {
-        Toastify({
-            text: "Please select only three images.",
-            duration: 3000,
-            gravity: "top",
-            position: "center",
-            backgroundColor: "red",
-        }).showToast();
-        return;
+    // Debugging helper
+    function showDebug(message) {
+        console.log(message);
     }
-    // Clear any previous images from the container
-    document.getElementById('addedImagesContainer').innerHTML = "";
-    filesToCrop = Array.from(files);
-    currentFileIndex = 0;
-    // Start cropping for the first file immediately after selection
-    openCropperForCurrentFile();
-}
 
-function openCropperForCurrentFile() {
-    if (currentFileIndex >= filesToCrop.length) {
-        // No more files to crop, hide cropping interface
-        document.querySelector('.image-cropper').classList.add('hidden');
-        return;
+    // Global variables
+    let cropper = null;
+    let imagesToProcess = [];
+    let currentImageIndex = 0;
+    let processedImages = [];
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        showDebug('Page loaded');
+        setupImageInput();
+    });
+
+    // Set up the image input event handler
+    function setupImageInput() {
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const files = this.files;
+            showDebug(`Selected ${files.length} files`);
+            
+            // Validate file count
+            if (files.length > 3) {
+                Toastify({
+                    text: "Please select maximum 3 images",
+                    duration: 3000,
+                    backgroundColor: "red",
+                }).showToast();
+                this.value = '';
+                return;
+            }
+            
+            if (files.length === 0) return;
+            
+            // Reset everything
+            resetCropping();
+            
+            // Store files and start processing
+            imagesToProcess = Array.from(files);
+            startImageProcessing();
+        });
     }
-    const file = filesToCrop[currentFileIndex];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const cropperContainer = document.querySelector('.image-cropper');
-        cropperContainer.classList.remove('hidden');
-        const croppedImg = document.getElementById('croppedImg');
-        croppedImg.src = e.target.result;
-        // Destroy any existing cropper instance before creating a new one
+
+    // Reset all cropping data
+    function resetCropping() {
+        // Clear cropper if exists
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        
+        // Reset variables
+        currentImageIndex = 0;
+        processedImages = [];
+        
+        // Clear preview container
+        document.getElementById('addedImagesContainer').innerHTML = '';
+    }
+
+    // Start the image processing workflow
+    function startImageProcessing() {
+        showDebug('Starting image processing');
+        if (imagesToProcess.length === 0) return;
+        
+        // Process first image
+        processCurrentImage();
+    }
+
+    // Process the current image
+    function processCurrentImage() {
+        showDebug(`Processing image ${currentImageIndex + 1} of ${imagesToProcess.length}`);
+        
+        // Update UI to show which image we're processing
+        document.getElementById('cropperIndex').textContent = `(${currentImageIndex + 1}/${imagesToProcess.length})`;
+        
+        // Get current file
+        const file = imagesToProcess[currentImageIndex];
+        
+        // Read the file
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById('croppedImg');
+            img.src = e.target.result;
+            
+            // Wait for image to load
+            img.onload = function() {
+                // Show cropper container
+                document.getElementById('cropperContainer').classList.remove('hidden');
+                
+                // Initialize cropper
+                initializeCropper(img);
+            };
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Initialize the cropper on the image
+    function initializeCropper(img) {
+        showDebug('Initializing cropper');
+        
+        // Destroy existing cropper if any
         if (cropper) {
             cropper.destroy();
         }
-        cropper = new Cropper(croppedImg, {
-            aspectRatio: NaN, // No fixed ratio, admin can crop freely
+        
+        // Create new cropper
+        cropper = new Cropper(img, {
             viewMode: 1,
-            autoCropArea: 1  // Initially use the full image (both height and width)
+            dragMode: 'move',
+            aspectRatio: NaN,
+            autoCropArea: 0.8,
+            restore: false,
+            guides: true,
+            center: true,
+            highlight: true,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+            toggleDragModeOnDblclick: false,
         });
+        
+        // Setup save button handler
+        setupSaveButton();
     }
-    reader.readAsDataURL(file);
-}
 
-  document.getElementById('saveButton').addEventListener('click', function(){
-      if (cropper) {
-          const canvas = cropper.getCroppedCanvas();
-          // Create a new image element for the cropped image
-          const imgElement = document.createElement('img');
-          imgElement.src = canvas.toDataURL();
-          imgElement.className = "w-40 h-40 object-cover rounded-md";
-          // Append the cropped image to the container
-          document.getElementById('addedImagesContainer').appendChild(imgElement);
-          // Destroy the cropper instance and hide cropping UI if needed
-          cropper.destroy();
-          cropper = null;
-          // Show success toast for the cropped image
-          Toastify({
-              text: "Image cropped successfully!",
-              duration: 2000,
-              gravity: "top",
-              position: "right",
-              backgroundColor: "green",
-          }).showToast();
-          // Move to next file
-          currentFileIndex++;
-          if (currentFileIndex < filesToCrop.length) {
-              openCropperForCurrentFile();
-          } else {
-              // All images processed, hide cropping UI and show a final success message
-              document.querySelector('.image-cropper').classList.add('hidden');
-              Toastify({
-                  text: "All images have been processed.",
-                  duration: 2000,
-                  gravity: "top",
-                  position: "right",
-                  backgroundColor: "green",
-              }).showToast();
-          }
-      }
-  });
+    // Set up the save button handler
+    function setupSaveButton() {
+        document.getElementById('saveButton').onclick = function() {
+            saveCroppedImage();
+        };
+    }
 
-  // Utility function to convert dataURL to Blob
-  function dataURLtoBlob(dataURL) {
-      const arr = dataURL.split(',');
-      const mime = arr[0].match(/:(.*?);/)[1];
-      const bstr = atob(arr[1]);
-      let n = bstr.length;
-      const u8arr = new Uint8Array(n);
-      while(n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-      }
-      return new Blob([u8arr], { type: mime });
-  }
+    // Save the cropped image
+    function saveCroppedImage() {
+        showDebug('Saving cropped image');
+        
+        if (!cropper) {
+            showDebug('Error: No cropper instance');
+            return;
+        }
+        
+        try {
+            // Get cropped canvas
+            const canvas = cropper.getCroppedCanvas({
+                maxWidth: 800,
+                maxHeight: 800,
+                fillColor: '#fff'
+            });
+            
+            if (!canvas) {
+                showDebug('Error: Could not get canvas');
+                return;
+            }
+            
+            // Create thumbnail preview
+            const imgElement = document.createElement('img');
+            imgElement.src = canvas.toDataURL('image/jpeg');
+            imgElement.className = 'w-32 h-32 object-cover rounded-md border border-gray-300';
+            
+            // Add to preview container
+            document.getElementById('addedImagesContainer').appendChild(imgElement);
+            
+            // Convert to blob and store
+            canvas.toBlob(function(blob) {
+                processedImages.push(blob);
+                
+                // Show success message
+                Toastify({
+                    text: `Image ${currentImageIndex + 1} processed successfully`,
+                    duration: 2000,
+                    backgroundColor: "green",
+                }).showToast();
+                
+                // Move to next image or finish
+                moveToNextImage();
+            }, 'image/jpeg', 0.9);
+            
+        } catch (error) {
+            showDebug('Error saving image: ' + error.message);
+            Toastify({
+                text: "Error processing image",
+                duration: 3000,
+                backgroundColor: "red",
+            }).showToast();
+        }
+    }
 
-  document.getElementById('addProductsForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      try {
-          const form = document.getElementById('addProductsForm');
-          const formData = new FormData(form);
-          // Remove the original file input data to prevent duplicate "image" field
-          formData.delete('image');
+    // Move to the next image or finish processing
+    function moveToNextImage() {
+        // Destroy current cropper
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        
+        // Increment index
+        currentImageIndex++;
+        
+        // Check if we have more images to process
+        if (currentImageIndex < imagesToProcess.length) {
+            // Process next image
+            processCurrentImage();
+        } else {
+            // All done
+            document.getElementById('cropperContainer').classList.add('hidden');
+            Toastify({
+                text: "All images processed successfully",
+                duration: 3000,
+                backgroundColor: "green",
+            }).showToast();
+        }
+    }
 
-          // Gather all cropped images from the preview container
-          const imageElements = document.querySelectorAll('#addedImagesContainer img');
-          imageElements.forEach((img, index) => {
-              const dataURL = img.src; // DataURL from the canvas
-              const blob = dataURLtoBlob(dataURL);
-              // Append the blob to FormData.
-              // If you expect an array on the server, use the same field name (e.g., 'image')
-              formData.append('image', blob, `cropped-${index}.png`);
-          });
-
-          const res = await fetch('/admin/addProducts', {
-              method: 'POST',
-              body: formData
-          });
-
-          if (!res.ok) {
-              const errorText = await res.text();
-              throw new Error(`Server error: ${res.status} - ${errorText}`);
-          }
-
-          const data = await res.json();
-          if (data.success) {
-              Swal.fire({
-                  icon: "success",
-                  title: "Success",
-                  text: data.message
-              }).then(() => {
-                  window.location.href = "/admin/products";
-              });
-          } else {
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: data.message
-              });
-          }
-      } catch (error) {
-          console.error("Submission error:", error);
-          Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Something went wrong!'
-          });
-      }
-  });
+    // Handle form submission
+    document.getElementById('addProductsForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Check if we have processed images
+        if (processedImages.length === 0) {
+            Toastify({
+                text: "Please select and crop at least one image",
+                duration: 3000,
+                backgroundColor: "red",
+            }).showToast();
+            return;
+        }
+        
+        try {
+            // Create form data from the form
+            const formData = new FormData(this);
+            
+            // Remove original file input data
+            formData.delete('image');
+            
+            // Add processed images
+            processedImages.forEach((blob, index) => {
+                formData.append('image', blob, `image-${index + 1}.jpg`);
+            });
+            
+            // Submit the form
+            const response = await fetch('/admin/addProducts', {
+                method: 'POST',
+                body: formData
+            });
+            
+            // Process response
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Server error');
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: result.message
+                }).then(() => {
+                    window.location.href = "/admin/products";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message
+                });
+            }
+            
+        } catch (error) {
+            console.error("Submission error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Something went wrong!'
+            });
+        }
+    });
 </script>
 
 <%- include("../admin/partials/footer") %>

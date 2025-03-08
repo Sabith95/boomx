@@ -35,9 +35,10 @@ const verifyLogin=async(req,res)=>{
             },
         })
 
-        res.cookie('token',token,{
+        res.cookie('adminToken',token,{
             httpOnly: true, 
-            secure: process.env.NODE_ENV === 'production' 
+            secure: process.env.NODE_ENV === 'production',
+            path:'/admin' 
         })
 
         res.status(200).json({message:"Login Success"})
@@ -52,7 +53,7 @@ const verifyLogin=async(req,res)=>{
     
     const loadDashboard= async(req,res)=>{
 
-         const token = req.cookies.token;
+         const token = req.cookies.adminToken;
           if (!token) {
             return res.redirect('/admin/login')
           }
@@ -66,8 +67,8 @@ const verifyLogin=async(req,res)=>{
 
     const logoutAdmin = async(req,res)=>{
         try {
-          res.clearCookie('token')
-          res.render('admin/login')
+          res.clearCookie('adminToken',{path:'/admin'})
+          res.redirect('/admin/login')
         } catch (error) {
           console.log(error.message);
           res.status(500).send('Server error during logout');

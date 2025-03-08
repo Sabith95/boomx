@@ -1,7 +1,13 @@
 const brand = require('../models/brandModel')
+const jwtHelper = require('../utils/jwtHelper');
 
 const loadBrands = async(req,res)=>{
     try {
+
+        const token = req.cookies.adminToken;
+              if (!token || !jwtHelper.verifyToken(token)) {
+                  return res.redirect('/admin/login');
+              }
 
         const page = parseInt(req.query.page) || 1
         const limit = 5

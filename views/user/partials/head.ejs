@@ -18,8 +18,14 @@
             <!-- Right side buttons -->
             <div class="flex items-center space-x-6">
                 <div class="hidden md:block">
-                    <form class="relative">
-                        <input type="text" placeholder="Search..." class="py-2 px-4 rounded-full text-gray-800 text-sm w-40 focus:w-56 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-300">
+                    <form id="searchForm" action="/user/shope" method="get"  class="relative">
+                        <input type="text" placeholder="Search..." class="py-2 px-4 rounded-full text-gray-800 text-sm w-40 focus:w-56 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-300"
+                        id="searchInput"
+                        name="search"
+                        value="<%= search %>">
+                        <button type="button" id="clearSearch"     class="   absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-purple-600">
+                            <i class="fas fa-times"></i>
+                        </button>
                         <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                             <i class="fa-solid fa-search text-sm"></i>
                         </button>
@@ -68,3 +74,29 @@
         </div>
     </div>
 </header>
+
+<script>
+    //for searching
+  document.getElementById('searchForm').addEventListener('submit',async function (e) {
+    const formData = new FormData(document.getElementById('searchForm'))
+    const queryParams= URLSearchParams(formData)
+    try {
+      await fetch(`/user/shope?${queryParams.toString()}`,{
+        method:'GET',
+        headers:{ 'Content-type':'application/json'}
+      })
+    } catch (error) {
+      console.log('Error',error)
+    }
+  })
+
+    //clear search 
+    document.getElementById('clearSearch').addEventListener('click',function(){
+        document.getElementById('searchInput').value=''
+        document.getElementById('searchForm').submit()
+      })
+
+
+
+
+</script>

@@ -131,7 +131,6 @@
     document.querySelectorAll('.changeStatus').forEach(button=>{
         button.addEventListener('click',function(){
             const userId = this.getAttribute('data-id')
-            console.log(userId)
             const action = this.getAttribute('data-status')
             const confirmText= (action==='block')?'Do yoy want to block this user' : 'Do you want to unblock this user'
 

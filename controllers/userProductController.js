@@ -1,6 +1,7 @@
 const product = require('../models/productModel')
 const brand =require('../models/brandModel')
-const category=require('../models/categoryModel')
+const category=require('../models/categoryModel');
+const { search } = require('../routes/adminRoutes');
 
 const loadShope = async (req, res) => {
     try {
@@ -101,6 +102,13 @@ const loadViewProduct = async(req,res)=>{
           return  res.redirect('/user/shope')
         }
 
+
+        const querySearch = req.query.search ? req.query.search.trim():""
+        const filter={}
+        if(querySearch){
+            filter.name ={$regex : new RegExp(querySearch,"i")}
+        }
+
         const relatedProducts=await product.find({
             category:products.category._id,
             _id:{$ne:id}
@@ -111,7 +119,7 @@ const loadViewProduct = async(req,res)=>{
 
 
 
-        res.render('user/viewProduct',{products,relatedProducts})
+        res.render('user/viewProduct',{products,relatedProducts,search:querySearch})
     } catch (error) {
         console.log(error.message)
     }
@@ -123,6 +131,11 @@ const loadCategories = async(req,res)=>{
         const limit=5
         const skip = (page -1)*limit
 
+        const querySearch = req.query.search ? req.query.search.trim():""
+        const filter={}
+        if(querySearch){
+            filter.name ={$regex : new RegExp(querySearch,"i")}
+        }
 
         const categoryId = req.params.id
         const products = await product.find({category:categoryId}).skip(skip).limit(limit)
@@ -130,7 +143,7 @@ const loadCategories = async(req,res)=>{
         .populate('category')
        const totalDocuments = await product.countDocuments({category:categoryId})
        const totalPages = await Math.ceil(totalDocuments/limit)
-       res.render('user/categories',{products,currentPage:page,totalPages})
+       res.render('user/categories',{products,currentPage:page,totalPages,search:querySearch})
         
     } catch (error) {
         console.log("Error ",error)

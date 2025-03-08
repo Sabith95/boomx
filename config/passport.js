@@ -15,7 +15,7 @@ async (accessToken, refreshToken, profile, done) => {
 
         if (existingUser) {
             // User exists, generate JWT token
-            const token = jwt.sign({ userId: existingUser._id }, JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ user: { _id: existingUser._id } }, JWT_SECRET, { expiresIn: '1h' });
             return done(null, { user: existingUser, token });
         }
 
@@ -24,13 +24,13 @@ async (accessToken, refreshToken, profile, done) => {
             googleId: profile.id,
             name: profile.displayName,
             email: profile.emails[0].value,
-            password: '', // No password for Google login users
+            password: '', 
         });
 
         await newUser.save();
 
-        const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: '1h' });
-        done(null, { user: newUser, token });
+        const token = jwt.sign({ user: { _id: newUser._id } }, JWT_SECRET, { expiresIn: '1h' });
+        return done(null, { user: newUser, token });
     } catch (error) {
         done(error);
     }

@@ -71,8 +71,10 @@
         // When resending, no email is needed since it is stored in session.
         const response = await fetch('/user/forgot-password/send-otp', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-          // No body sent; the controller will use session email.
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin', // ensures session cookies are sent
+           body: JSON.stringify({}) 
+          
         });
         const data = await response.json();
         if (response.ok) {

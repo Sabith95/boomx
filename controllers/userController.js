@@ -4,7 +4,8 @@ const otpHelper = require('../utils/otpHelper');
 const jwt = require('jsonwebtoken');
 const jwtHelper = require('../utils/jwtHelper');
 const category=require('../models/categoryModel')
-const product = require('../models/productModel')
+const product = require('../models/productModel');
+const { search } = require('../routes/adminRoutes');
 
 const loadSignUp = async (req, res) => {
   try {
@@ -72,7 +73,7 @@ const loadLogin = async (req, res) => {
 const logoutUser = async(req,res)=>{
   try {
     res.clearCookie('token')
-    res.render('user/login')
+    res.redirect('/user/login')
   } catch (error) {
     console.log(error.message);
     res.status(500).send('Server error during logout');
@@ -89,12 +90,18 @@ const loadDashboard = async(req, res) => {
     return res.redirect('/user/login')
   }
 
+  const querySearch = req.query.search ? req.query.search.trim():""
+  const filter={}
+  if(querySearch){
+    filter.name ={$regex : new RegExp(querySearch,"i")}
+}
+
   
   const categories =await category.find()
   const products= await product.find()
 
 
-  res.render('user/home', { user: decoded.user,categories,products });
+  res.render('user/home', { user: decoded.user,categories,products,search:querySearch });
 };
 
 const userVerifyLogin = async (req, res) => {
@@ -145,7 +152,10 @@ const forgotPasswordSendOtp = async (req, res) => {
       verified: false
     };
     await otpHelper.sendOtpEmail(email, otp);
+    console.log(otp);
     return res.json({ message: "OTP sent successfully" });
+   
+    
   } catch (error) {
     console.error("Error in forgotPasswordSendOtp:", error);
     return res.status(500).json({ error: "Failed to send OTP." });

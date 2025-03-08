@@ -1,8 +1,15 @@
 const user = require('../models/userModel')
-const { search } = require('../routes/adminRoutes')
+const jwtHelper = require('../utils/jwtHelper');
+
 
 const loadUser = async (req,res)=>{
     try {
+
+        const token = req.cookies.adminToken;
+        if (!token || !jwtHelper.verifyToken(token)) {
+            return res.redirect('/admin/login');
+        }
+
         const page= parseInt(req.query.page || 1)
         const limit=5
         const skip=(page-1)*limit
@@ -24,6 +31,12 @@ const loadUser = async (req,res)=>{
 
 const updateStatus = async (req,res)=>{
     try {
+
+        const token = req.cookies.adminToken;
+        if (!token || !jwtHelper.verifyToken(token)) {
+            return res.status(401).json({ success: false, message: "Unauthorized access" });
+        }
+
         const userId = req.params.id
         const{action} = req.body    
         

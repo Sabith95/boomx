@@ -11,7 +11,8 @@ const checkUserStatus = async (req, res, next) => {
   
     const user = await User.findById(decoded.user._id);
     if (!user || !user.isListed) {
-      return res.status(403).json({ error: 'Access denied. Your account is blocked.' });
+      res.clearCookie('token')
+      return res.redirect('/user/login')
     }
     
     req.user = user;

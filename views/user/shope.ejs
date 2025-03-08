@@ -3,36 +3,14 @@
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
 
-      <!-- Search, Sort & Filter Section (single line) -->
-        <div class="flex flex-col md:flex-row items-center gap-4 mb-6">
-            <!-- Search Bar (Left) -->
-             
-            <div class="w-full md:w-1/2">
-              <form id="searchForm"  action="/user/shope" method="GET">
-              <div class="relative">
-                  <input 
-                      id="searchInput"
-                      name="search"
-                      type="text" 
-                      placeholder="Search products..."
-                      class="w-full py-2 px-4 pr-16 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
-                      value="<%= search %>"
-                  >
-                  <button type="button" id="clearSearch"     class="   absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-purple-600">
-                      <i class="fas fa-times"></i>
-                  </button>
-                  <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-purple-600">
-                      <i class="fas fa-search"></i>
-                  </button>
-              </div>
-          </div>
-        </form>
-    
-    <!-- Sort & Filter Options (Right) -->
-    <div class="w-full md:w-1/2 flex items-center justify-end space-x-3">
-        <!-- Sort Dropdown -->
-        <form method="GET" action="/user/shope">
+ <!-- Search, Sort & Filter Section (single line) -->
+<div class="flex flex-col md:flex-row items-center gap-4 mb-6">
+  <!-- Sort & Filter Options (Right) -->
+  <div class="w-full md:w-1/2 ml-auto flex items-center justify-end space-x-3">
+      <!-- Sort Dropdown -->
+      <form method="GET" action="/user/shope">
           <!-- Preserve current filter values -->
+          <input type="hidden" name="search" value="<%= search %>">
           <input type="hidden" name="category" value="<%= typeof category !== 'undefined' ? category : '' %>">
           <input type="hidden" name="brand" value="<%= typeof brand !== 'undefined' ? brand : '' %>">
           <input type="hidden" name="minPrice" value="<%= typeof minPrice !== 'undefined' ? minPrice : '' %>">
@@ -49,61 +27,60 @@
               <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest First</option>
             </select>
           </div>
-        </form>
-        
-          
-        
-
-    <!-- Filter Button and Dropdown -->
-    <div class="relative">
-      <button id="filter-button" class="bg-white py-1 px-3 rounded-lg border border-gray-300 font-medium text-sm flex items-center space-x-1">
-        <span>Filter</span>
-        <i class="fas fa-chevron-down transition-transform duration-300" id="filter-icon"></i>
-      </button>
-      <div id="filter-dropdown" class="absolute right-0 z-10 mt-2 w-64 bg-white p-4 rounded-lg shadow-md hidden">
-        <!-- Added Form for Filters -->
-        <form method="GET" action="/user/shope">
-          <!-- Preserve current sort value -->
-          <input type="hidden" name="sort" value="<%= typeof sort !== 'undefined' ? sort : '' %>">
-          
-          <!-- Category Filter -->
-          <div class="mb-3">
-            <label for="filter-category" class="block text-sm font-medium text-gray-700">Category</label>
-            <select id="filter-category" name="category" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-              <option value="">All Categories</option>
-              <% categories.forEach(cat => { %>
-                <option value="<%= cat._id %>" <%= category == cat._id ? 'selected' : '' %>><%= cat.name %></option>
-              <% }); %>
-            </select>
-          </div>
-          <!-- Brand Filter -->
-          <div class="mb-3">
-            <label for="filter-brand" class="block text-sm font-medium text-gray-700">Brand</label>
-            <select id="filter-brand" name="brand" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-              <option value="">All Brands</option>
-              <% brands.forEach(b => { %>
-                <option value="<%= b._id %>" <%= brand == b._id ? 'selected' : '' %>><%= b.name %></option>
-              <% }); %>
-            </select>
-          </div>
-          <!-- Price Range Filter -->
-          <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700">Price Range</label>
-            <div class="flex items-center space-x-2 mt-1">
-              <input type="number" name="minPrice" placeholder="Min" value="<%= typeof minPrice !== 'undefined' ? minPrice : '' %>" class="w-1/2 border rounded px-2 py-1 focus:outline-none">
-              <input type="number" name="maxPrice" placeholder="Max" value="<%= typeof maxPrice !== 'undefined' ? maxPrice : '' %>" class="w-1/2 border rounded px-2 py-1 focus:outline-none">
+      </form>
+      
+      <!-- Filter Button and Dropdown -->
+      <div class="relative">
+        <button id="filter-button" class="bg-white py-1 px-3 rounded-lg border border-gray-300 font-medium text-sm flex items-center space-x-1">
+          <span>Filter</span>
+          <i class="fas fa-chevron-down transition-transform duration-300" id="filter-icon"></i>
+        </button>
+        <div id="filter-dropdown" class="absolute right-0 z-10 mt-2 w-64 bg-white p-4 rounded-lg shadow-md hidden">
+          <!-- Added Form for Filters -->
+          <form method="GET" action="/user/shope">
+            <!-- Preserve current sort value -->
+            <input type="hidden" name="sort" value="<%= typeof sort !== 'undefined' ? sort : '' %>">
+            <input type="hidden" name="search" value="<%= search %>">
+            
+            <!-- Category Filter -->
+            <div class="mb-3">
+              <label for="filter-category" class="block text-sm font-medium text-gray-700">Category</label>
+              <select id="filter-category" name="category" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                <option value="">All Categories</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat._id %>" <%= category == cat._id ? 'selected' : '' %>><%= cat.name %></option>
+                <% }); %>
+              </select>
             </div>
-          </div>
-          <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md text-sm">Apply Filters</button>
-        </form>
-        
-        <!-- End of Filter Form -->
+            <!-- Brand Filter -->
+            <div class="mb-3">
+              <label for="filter-brand" class="block text-sm font-medium text-gray-700">Brand</label>
+              <select id="filter-brand" name="brand" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                <option value="">All Brands</option>
+                <% brands.forEach(b => { %>
+                  <option value="<%= b._id %>" <%= brand == b._id ? 'selected' : '' %>><%= b.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <!-- Price Range Filter -->
+            <div class="mb-3">
+              <label class="block text-sm font-medium text-gray-700">Price Range</label>
+              <div class="flex items-center space-x-2 mt-1">
+                <input type="number" name="minPrice" placeholder="Min" value="<%= typeof minPrice !== 'undefined' ? minPrice : '' %>" class="w-1/2 border rounded px-2 py-1 focus:outline-none">
+                <input type="number" name="maxPrice" placeholder="Max" value="<%= typeof maxPrice !== 'undefined' ? maxPrice : '' %>" class="w-1/2 border rounded px-2 py-1 focus:outline-none">
+              </div>
+            </div>
+            <div class="flex space-x-2">
+              <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md text-sm">Apply Filters</button>
+              <a href="/user/shope" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-md text-sm text-center">Reset</a>
+            </div>
+          </form>
+          <!-- End of Filter Form -->
+        </div>
       </div>
   </div>
-  
-        </div>
-    </div>
 </div>
+
 
         <!-- Products Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -134,7 +111,7 @@
                             <span class="text-gray-600 text-sm ml-2">(<%= product.rating %>)</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="font-bold text-2xl">$<%= product.salePrice %></span>
+                            <span class="font-bold text-2xl">₹<%= product.salePrice %></span>
                             <button id="addToCartBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full text-sm"  >
                                 Add to Cart
                             </button>

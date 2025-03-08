@@ -71,19 +71,37 @@
                 <div class="flex items-center space-x-4" id="imagePreview">
                   <% if(product.image && product.image.length > 0) { %>
                     <% product.image.forEach(function(img, index) { %>
-                      <img src="<%= img %>" alt="Current product image" class="w-24 h-24 object-cover rounded" id="preview-<%= index %>">
+                      <div class="relative" id="image-container-<%= index %>">
+                        <img src="<%= img %>" alt="Current product image" class="w-24 h-24 object-cover rounded" id="preview-<%= index %>">
+                        <input type="hidden" name="existingImages[]" value="<%= img %>">
+                        <button type="button" class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center -mt-2 -mr-2 replace-image-btn" data-index="<%= index %>">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        </button>
+                        <input type="file" class="hidden single-image-input" id="image-input-<%= index %>" data-index="<%= index %>" accept="image/*">
+                      </div>
                     <% }); %>
                     <% for(let i = product.image.length; i < 3; i++) { %>
-                      <div class="w-24 h-24 bg-gray-200 rounded" id="preview-<%= i %>"></div>
+                      <div class="relative" id="image-container-<%= i %>">
+                        <div class="w-24 h-24 bg-gray-200 rounded flex items-center justify-center" id="preview-<%= i %>">
+                          <button type="button" class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center add-image-btn" data-index="<%= i %>">+</button>
+                        </div>
+                        <input type="file" class="hidden single-image-input" id="image-input-<%= i %>" data-index="<%= i %>" accept="image/*">
+                      </div>
                     <% } %>
                   <% } else { %>
-                    <div class="w-24 h-24 bg-gray-200 rounded" id="preview-0"></div>
-                    <div class="w-24 h-24 bg-gray-200 rounded" id="preview-1"></div>
-                    <div class="w-24 h-24 bg-gray-200 rounded" id="preview-2"></div>
+                    <% for(let i = 0; i < 3; i++) { %>
+                      <div class="relative" id="image-container-<%= i %>">
+                        <div class="w-24 h-24 bg-gray-200 rounded flex items-center justify-center" id="preview-<%= i %>">
+                          <button type="button" class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center add-image-btn" data-index="<%= i %>">+</button>
+                        </div>
+                        <input type="file" class="hidden single-image-input" id="image-input-<%= i %>" data-index="<%= i %>" accept="image/*">
+                      </div>
+                    <% } %>
                   <% } %>
-                  <input class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="imagesInput" type="file" name="image" accept="image/*" multiple>
                 </div>
-              </div>
+            </div>
             <div class="flex items-center justify-between">
                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
                     Update Product
@@ -112,32 +130,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script>
       let cropper;
-      let cropQueue = []; // Queue to process each image sequentially
-      const croppedFiles = [];
+      let currentImageIndex = null;
+      const croppedFiles = new Array(3).fill(null);
 
-      document.getElementById('imagesInput').addEventListener('change', function(e) {
-        const files = e.target.files;
-        cropQueue = [];
-        if (files && files.length > 0) {
-          Array.from(files).slice(0, 3).forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-              cropQueue.push({ data: event.target.result, index: index });
-              if(cropQueue.length === 1) {
-                openCropModal(event.target.result, index);
-              }
-            }
-            reader.readAsDataURL(file);
-          });
-        }
+      // Handle replace image buttons
+      document.querySelectorAll('.replace-image-btn, .add-image-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const index = this.dataset.index;
+          document.getElementById(`image-input-${index}`).click();
+        });
       });
 
-      function processQueue() {
-        if(cropQueue.length > 0) {
-          const nextItem = cropQueue[0];
-          openCropModal(nextItem.data, nextItem.index);
-        }
-      }
+      // Handle individual image inputs
+      document.querySelectorAll('.single-image-input').forEach(input => {
+        input.addEventListener('change', function(e) {
+          if (e.target.files && e.target.files[0]) {
+            const index = parseInt(this.dataset.index);
+            currentImageIndex = index;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+              openCropModal(event.target.result, index);
+            }
+            reader.readAsDataURL(e.target.files[0]);
+          }
+        });
+      });
 
       function openCropModal(imageSrc, previewIndex) {
         const cropModal = document.getElementById('cropModal');
@@ -152,30 +169,56 @@
       }
 
       document.getElementById('cropBtn').addEventListener('click', function() {
-        if (cropper) {
+        if (cropper && currentImageIndex !== null) {
           const canvas = cropper.getCroppedCanvas({
             width: 200,
             height: 200,
           });
           canvas.toBlob(function(blob) {
             const croppedImageUrl = URL.createObjectURL(blob);
-            let previewElement = document.getElementById('preview-' + cropQueue[0].index);
-            if (!previewElement) {
-              previewElement = document.createElement('img');
-              previewElement.id = 'preview-' + cropQueue[0].index;
-              previewElement.className = "w-24 h-24 object-cover rounded";
-              document.getElementById('imagePreview').appendChild(previewElement);
+            const previewElement = document.getElementById(`preview-${currentImageIndex}`);
+            const container = document.getElementById(`image-container-${currentImageIndex}`);
+            
+            // If it's a div (empty slot), replace it with an img
+            if (previewElement.tagName.toLowerCase() === 'div') {
+              const imgElement = document.createElement('img');
+              imgElement.id = `preview-${currentImageIndex}`;
+              imgElement.className = "w-24 h-24 object-cover rounded";
+              imgElement.src = croppedImageUrl;
+              
+              // Create replace button for new image
+              const replaceBtn = document.createElement('button');
+              replaceBtn.type = 'button';
+              replaceBtn.className = 'absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center -mt-2 -mr-2 replace-image-btn';
+              replaceBtn.dataset.index = currentImageIndex;
+              replaceBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>';
+              replaceBtn.addEventListener('click', function() {
+                document.getElementById(`image-input-${currentImageIndex}`).click();
+              });
+              
+              // Clear container and add new elements
+              while (container.firstChild) {
+                container.removeChild(container.firstChild);
+              }
+              container.appendChild(imgElement);
+              container.appendChild(replaceBtn);
+              container.appendChild(document.getElementById(`image-input-${currentImageIndex}`));
+            } else {
+              previewElement.src = croppedImageUrl;
             }
-            previewElement.src = croppedImageUrl;
-            croppedFiles[cropQueue[0].index] = blob;
+            
+            // Store the blob for form submission
+            croppedFiles[currentImageIndex] = blob;
+            
+            // Remove existing image from the form data if it exists
+            const existingImageInput = container.querySelector('input[name="existingImages[]"]');
+            if (existingImageInput) {
+              existingImageInput.remove();
+            }
+
             cropper.destroy();
             cropper = null;
-            cropQueue.shift();
-            if (cropQueue.length > 0) {
-              processQueue();
-            } else {
-              document.getElementById('cropModal').classList.add('hidden');
-            }
+            document.getElementById('cropModal').classList.add('hidden');
           });
         }
       });
@@ -186,51 +229,48 @@
           cropper = null;
         }
         document.getElementById('cropModal').classList.add('hidden');
-        if(cropQueue.length > 0) {
-          cropQueue.shift();
-          if(cropQueue.length > 0) {
-            processQueue();
-          }
-        }
       });
-// editing product
 
-      document.getElementById('editProductForm').addEventListener('submit', async function (e) {
+      // Handle form submission
+      document.getElementById('editProductForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+        const formData = new FormData(this);
 
-        const form = document.getElementById('editProductForm');
-        const formData = new FormData(form);
+        // Add cropped images to form data
+        croppedFiles.forEach((blob, index) => {
+          if (blob) {
+            formData.append('image', blob, `image${index}.jpg`);
+          }
+        });
 
         try {
-            const result = await fetch(form.action, {
-                method: 'PUT',
-                body: formData
-            });
-            const data = await result.json();
-            
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: data.message
-                }).then(() => {
-                    window.location.href = '/admin/products';
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: data.message
-                });
-            }
-        } catch (error) {
+          const response = await fetch(this.action, {
+            method: 'PUT',  
+            body: formData
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
             Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Something went wrong'
+              icon: 'success',
+              title: 'Success',
+              text: data.message
+            }).then(() => {
+              window.location.href = '/admin/products';
             });
+          } else {
+            throw new Error(data.message || 'Failed to update product');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to update product'
+          });
         }
-    });
+      });
     </script>
 </body>
 <%- include("../admin/partials/footer") -%>

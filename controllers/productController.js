@@ -1,10 +1,18 @@
 const product = require('../models/productModel')
 const brand = require('../models/brandModel')
 const category =require('../models/categoryModel')
+const jwtHelper = require('../utils/jwtHelper');
+
 
 
 const loadAddProducts = async (req,res)=>{
     try {
+
+        const token = req.cookies.adminToken;
+        if (!token || !jwtHelper.verifyToken(token)) {
+            return res.redirect('/admin/login');
+        }
+
         const brands = await brand.find()
         const categories= await category.find()
         
@@ -17,6 +25,12 @@ const loadAddProducts = async (req,res)=>{
 
 const loadProducts = async(req,res)=>{
     try {
+
+        const token = req.cookies.adminToken;
+        if (!token || !jwtHelper.verifyToken(token)) {
+            return res.redirect('/admin/login');
+        }
+
 
         const page = parseInt(req.query.page) || 1
         const limit = 5
@@ -44,10 +58,25 @@ const loadProducts = async(req,res)=>{
 
 const verifyAddProduct=async (req,res)=>{
     try {
+
+        const token = req.cookies.adminToken;
+        if (!token || !jwtHelper.verifyToken(token)) {
+            return res.status(401).json({ success: false, message: "Unauthorized access" });
+        }
+
         const {name,description,brand,category,salePrice,regularPrice,quantity} =req.body
-        console.log(req.body);
         
-        console.log("this is the name",name)
+        if(Number(regularPrice)<=0 || Number(salePrice)<=0){
+            return res.status(400).json({
+                success:false,
+                message:"Price must be greater than zero"
+            })
+        }
+        
+        if(Number(quantity)<0){
+            return res.status(400).json({message:"Quantity cannot be set to a negative value."})
+        }
+       
         const existingProduct = await product.findOne({name})
         if(existingProduct){
             return res.status(400).json({success:false,message:"Product already registered"})
@@ -69,6 +98,12 @@ const verifyAddProduct=async (req,res)=>{
 const updateStatus =async(req,res)=>{
 
     try {
+
+        const token = req.cookies.adminToken;
+        if (!token || !jwtHelper.verifyToken(token)) {
+            return res.status(401).json({ success: false, message: "Unauthorized access" });
+        }
+
         const productId = req.params.id
         const {action}  = req.body
         
@@ -90,6 +125,12 @@ const updateStatus =async(req,res)=>{
 
 const loadEdit = async(req,res)=> {
     try {
+
+        const token = req.cookies.adminToken;
+        if (!token || !jwtHelper.verifyToken(token)) {
+            return res.redirect('/admin/login');
+        }
+
         const brands = await brand.find()
         const categories = await category.find()
 
@@ -106,6 +147,12 @@ const loadEdit = async(req,res)=> {
 
 const editProduct= async (req,res)=>{
     try {
+
+        const token = req.cookies.adminToken;
+        if (!token || !jwtHelper.verifyToken(token)) {
+            return res.status(401).json({ success: false, message: "Unauthorized access" });
+        }
+
         const {id} = req.params
         console.log(id);
         
@@ -161,4 +208,4 @@ module.exports = {
     updateStatus,
     loadEdit,
     editProduct
-}
+}      
