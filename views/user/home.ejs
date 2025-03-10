@@ -7,7 +7,7 @@
 <section class="relative h-96 md:h-screen max-h-screen">
     <!-- Full-length background image -->
     <div class="absolute inset-0 w-full h-full">
-        <img src="/images/logos/banner-1.png" alt="BoomX Hero Banner" class="w-full h-full object-cover">
+        <img src="/images/logos/banner-2.png" alt="BoomX Hero Banner" class="w-full h-full object-cover">
         <!-- Overlay gradient for better text visibility -->
         <!-- <div class="absolute inset-0 bg-gradient-to-r from-purple-900/80 to-purple-700/50"></div> -->
     </div>
@@ -26,15 +26,15 @@
 </section>
 
 <!-- Featured Categories -->
-<section class="py-12 bg-purple-50">
+<section class="py-12">
     <div class="container mx-auto px-4">
       <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">Shop By Category</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <% categories.forEach(function(cat) { %>
           <a href="/user/categories/<%= cat.id %>" class="group">
             <div class="flex flex-col items-center">
-              <div class="w-32 h-32 md:w-40 md:h-40 rounded-full shadow-md overflow-hidden group-hover:shadow-lg transition-shadow">
-                <img src="<%= cat.image %>" alt="<%= cat.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+              <div class="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-md overflow-hidden group-hover:shadow-lg transition-shadow">
+                <img src="<%= cat.image %>" alt="<%= cat.title %>" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300">
               </div>
               <h3 class="mt-4 text-black font-medium text-center"><%= cat.name %></h3>
             </div>
@@ -47,35 +47,51 @@
   
   
   
-  <section class="py-12 bg-gray-50">
+  
+  
+  <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-        <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">New Arrivals</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <% products.slice(0, 4).forEach(function(product){ %>
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow transform hover:-translate-y-1">
-                    <a href="/user/view-product/<%= product.id %>">
-                        <div class="h-48 bg-white-100 flex items-center justify-center p-4">
-                            <img src="<%= product.image[0] %>" alt="<%= product.name %>" class="w-full h-full object-contain">
-                        </div>
-                        <div class="p-5">
-                            <h3 class="font-semibold text-gray-900 mb-2 truncate text-lg"><%= product.name %></h3>
-                            <!-- <p class="text-gray-600 text-sm mb-3 line-clamp-2 h-12"><%= product.description %></p> -->
-                            <div class="flex justify-between items-center">
-                                <span class="font-bold text-purple-700 text-lg">$<%= product.salePrice %></span>
-                                <% if (product.regularPrice) { %>
-                                    <span class="text-gray-400 text-sm line-through">$<%= product.regularPrice %></span>
-                                <% } %>
-                            </div>
-                        </div>
-                    </a>
+      <h2 class="text-3xl font-bold text-center mb-12 text-gray-800 relative">
+        <span class="relative inline-block">
+          New Arrivals
+          <span class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-purple-500 rounded-full"></span>
+        </span>
+      </h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+        <% products.slice(0, 4).forEach(function(product){ %>
+          <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group">
+            <a href="/user/view-product/<%= product.id %>">
+              <div class="h-52 bg-gray-50 flex items-center justify-center p-4 relative overflow-hidden">
+                <img src="<%= product.image[0] %>" alt="<%= product.name %>" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110">
+                <div class="absolute top-3 right-3 bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full">New</div>
+              </div>
+              <div class="p-5">
+                <h3 class="font-semibold text-gray-900 mb-2 truncate text-lg group-hover:text-purple-700 transition-colors"><%= product.name %></h3>
+                <div class="flex justify-between items-center">
+                  <span class="font-bold text-purple-700 text-lg">₹<%= product.salePrice %></span>
+                  <% if (product.regularPrice) { %>
+                    <span class="text-gray-400 text-sm line-through">₹<%= product.regularPrice %></span>
+                  <% } %>
                 </div>
-            <% }) %>
-        </div>
-        <div class="text-center mt-8">
-            <a href="/user/shope" class="inline-block bg-purple-600 text-white py-2 px-6 rounded-full font-medium hover:bg-purple-700 transition-colors shadow-md">View All Products</a>
-        </div>
+                <div class="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span class="inline-block w-full text-center bg-purple-600 text-white py-2 rounded-lg font-medium">View Details</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        <% }) %>
+      </div>
+      <div class="text-center mt-12">
+        <a href="/user/shope" class="inline-flex items-center justify-center bg-purple-600 text-white py-3 px-8 rounded-full font-medium hover:bg-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group">
+          <span>View All Products</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+      </div>
     </div>
-</section>
+  </section>
+  
 
 
 
@@ -85,7 +101,7 @@
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="relative rounded-lg overflow-hidden shadow-md h-48 md:h-64">
-                    <img src="" alt="Special Offer" class="w-full h-full object-cover">
+                    <img src="/images/logos/Banner-2.png" alt="Special Offer" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-purple-900/40 flex flex-col justify-center px-6 text-white">
                         <h3 class="text-xl md:text-2xl font-bold mb-2">Special Offers</h3>
                         <p class="mb-4">Up to 50% off on selected items</p>
@@ -93,11 +109,11 @@
                     </div>
                 </div>
                 <div class="relative rounded-lg overflow-hidden shadow-md h-48 md:h-64">
-                    <img src="" alt="New Arrivals" class="w-full h-full object-cover">
+                    <img src="/images/logos/Banner-3.png" alt="New Arrivals" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-purple-900/40 flex flex-col justify-center px-6 text-white">
                         <h3 class="text-xl md:text-2xl font-bold mb-2">New Collection</h3>
                         <p class="mb-4">Check out our latest arrivals</p>
-                        <a href="/shop/new-arrivals" class="inline-block bg-white text-purple-700 py-2 px-4 rounded-full font-medium hover:bg-purple-100 transition-colors self-start">Discover</a>
+                        <a href="/user/shope" class="inline-block bg-white text-purple-700 py-2 px-4 rounded-full font-medium hover:bg-purple-100 transition-colors self-start">Discover</a>
                     </div>
                 </div>
             </div>
@@ -125,7 +141,7 @@
                         <i class="fa-solid fa-truck text-purple-700 text-xl"></i>
                     </div>
                     <h3 class="font-medium text-gray-800 mb-2">Free Shipping</h3>
-                    <p class="text-gray-600 text-sm">On orders over $50</p>
+                    <p class="text-gray-600 text-sm">On orders over ₹50</p>
                 </div>
                 <div class="p-4">
                     <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
