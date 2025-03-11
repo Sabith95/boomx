@@ -8,7 +8,13 @@ const loadDashboard = async(req, res) => {
 try {
     const products = await product.find()
     const categories = await category.find()
-    res.render('user/home',{products,categories,user:null})
+
+    const querySearch = req.query.search ? req.query.search : ""
+    const filter ={}
+    if(querySearch){
+        filter.name={$regex : new RegExp(querySearch,"i")}
+    }
+    res.render('user/home',{products,categories,user:null,search:querySearch})
 } catch (error) {
     console.error(error)
 }

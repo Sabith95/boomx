@@ -50,6 +50,9 @@ const loadShope = async (req, res) => {
             filter.name = { $regex: new RegExp(querySearch, "i") };
         }
 
+        filter.isListed = true;
+        
+
         // Query products with filtering, sorting, and pagination
         let productsQuery = product.find(filter)
             .skip(skip)
@@ -97,11 +100,6 @@ const loadViewProduct = async(req,res)=>{
         const products =await product.findById(id)
         .populate('brand')
         .populate('category')
-
-        if(!products.isListed){
-          return  res.redirect('/user/shope')
-        }
-
 
         const querySearch = req.query.search ? req.query.search.trim():""
         const filter={}

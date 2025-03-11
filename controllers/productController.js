@@ -145,61 +145,108 @@ const loadEdit = async(req,res)=> {
     }
 }
 
-const editProduct= async (req,res)=>{
+const editProduct = async (req, res) => {
     try {
-
         const token = req.cookies.adminToken;
         if (!token || !jwtHelper.verifyToken(token)) {
             return res.status(401).json({ success: false, message: "Unauthorized access" });
         }
 
-        const {id} = req.params
-        console.log(id);
+        const { id } = req.params;
         
-        const{name,description,brand,category,salePrice,regularPrice,quantity}= req.body
-        console.log(req.body)
+        const { name, description, brand, category, salePrice, regularPrice, quantity, existingImages } = req.body;
+        console.log("Request body:", req.body);
+        console.log("Files:", req.files); // Log files to see what's actually being received
 
-        if(!name || !description){
-            return res.status(400).json({success:false,message:"Name and description are required"})
+        if (!name || !description) {
+            return res.status(400).json({ success: false, message: "Name and description are required" });
         }
 
         const duplicate = await product.findOne({
-            name:name.trim(),
-            _id:{$ne:id}    
-        })
-        if(duplicate){
-            res.status(400).json({success:false,message:"A product with that name is already exist"})
+            name: name.trim(),
+            _id: { $ne: id }    
+        });
+        
+        if (duplicate) {
+            return res.status(400).json({ success: false, message: "A product with that name already exists" });
         }
 
-        const updatedData={
-            name:name.trim(),
-            description:description.trim(),
-            brand:brand,
-            category:category,
-            salePrice:salePrice.trim(),
-            regularPrice:regularPrice.trim(),
-            quantity:quantity.trim()
+        // Get current product
+        const currentProduct = await product.findById(id);
+        if (!currentProduct) {
+            return res.status(400).json({ success: false, message: "Product not found" });
         }
 
-        if(req.file){
-            updatedData.image='/uploads' + req.file.filename
+        const updatedData = {
+            name: name.trim(),
+            description: description.trim(),
+            brand: brand,
+            category: category,
+            salePrice: salePrice.trim(),
+            regularPrice: regularPrice.trim(),
+            quantity: quantity.trim()
+        };
+
+        // Handle image uploads
+        let updatedImages = [];
+        
+        if (existingImages) {
+            updatedImages = Array.isArray(existingImages) ? existingImages : [existingImages];
+        } 
+        
+        else if ((!req.files || req.files.length === 0) && !req.file) {
+            updatedImages = currentProduct.image || [];
         }
+        
+        if (req.files) {
+            if (Array.isArray(req.files)) {
+                const newImages = req.files.map(file => '/uploads/' + file.filename);
+                updatedImages = updatedImages.concat(newImages);
+            } 
+            else if (typeof req.files === 'object') {
+                Object.keys(req.files).forEach(fieldname => {
+                    const fieldFiles = req.files[fieldname];
+                    let newImages = [];
+                    if (Array.isArray(fieldFiles)) {
+                        newImages = fieldFiles.map(file => '/uploads/' + file.filename);
+                    } else {
+                        // If it's not an array, treat it as a single file object.
+                        newImages.push('/uploads/' + fieldFiles.filename);
+                    }
+                    updatedImages = updatedImages.concat(newImages);
+                });
+            }
+        } 
+        // Handle single file upload
+        else if (req.file) {
+            updatedImages.push('/uploads/' + req.file.filename);
+        }
+        
+        updatedImages = [...new Set(updatedImages)];
+       
+        if (updatedImages.length > 0) {
+            updatedData.image = updatedImages;
+            console.log("Final image array:", updatedData.image);
+        }
+        
         const updatedProduct = await product.findByIdAndUpdate(
             id,
             updatedData,
-            {new:true}
-        )
-        if(!updatedProduct){
-            res.status(400).json({success:false,message:"Product not found"})
+            { new: true }
+        );
+        
+        if (!updatedProduct) {
+            return res.status(400).json({ success: false, message: "Product not found" });
         }
 
-        res.status(200).json({success:true,message:"Product updated",product:updatedProduct})
+        return res.status(200).json({ success: true, message: "Product updated", product: updatedProduct });
 
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({success:false,message:"Something went wrong"})
+        console.log(error.message);
+        return res.status(500).json({ success: false, message: "Something went wrong" });
     }
-}
+};
+
 
 module.exports = {
     loadAddProducts,
