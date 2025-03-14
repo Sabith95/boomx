@@ -1,0 +1,335 @@
+<%- include('../user/partials/header') %>
+<%- include('../user/partials/head') %>
+  <!-- Include Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+  <style>
+    /* Custom styles can be added here */
+    .active-tab {
+      background-color: #f3e8ff;
+      color: #7e22ce;
+      border-left: 4px solid #7e22ce;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-purple-700 text-white p-6">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">My Account</h1>
+      
+    </div>
+  </header>
+
+  <main class="container mx-auto py-8 px-4">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+      <!-- Profile Summary Card -->
+      <div class="md:col-span-12 bg-white shadow-md rounded-lg">
+        <div class="p-6">
+          <div class="flex flex-col md:flex-row items-center gap-6">
+            <div class="h-24 w-24 rounded-full border-4 border-purple-200 overflow-hidden">
+              <img src="<%= user.image || '/placeholder.svg?height=100&width=100' %>" alt="<%= user.name %>" class="h-full w-full object-cover">
+            </div>
+            <div class="flex-1 text-center md:text-left">
+              <h2 class="text-2xl font-bold text-gray-800"><%= user.name %></h2>
+              <p class="text-gray-500"><%= user.email %></p>
+              <!-- <p class="text-gray-500"><%= user.mobile %></p>
+              <p class="text-sm text-gray-400 mt-1">Member since <%= user.created%></p> -->
+            </div>
+            <div class="flex gap-3 mt-4 md:mt-0">
+              <!-- <a href="/profile/edit" class="inline-flex items-center px-4 py-2 border border-purple-200 text-purple-700 hover:bg-purple-50 rounded-md">
+                <i data-lucide="edit" class="h-4 w-4 mr-2"></i>
+                Edit Profile
+              </a> -->
+              <!-- <a href="/user/logout" class="inline-flex items-center px-4 py-2 text-gray-500 hover:text-gray-700 rounded-md">
+                <i data-lucide="log-out" class="h-4 w-4 mr-2"></i>
+                Sign Out
+              </a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Navigation -->
+      <div class="md:col-span-3">
+        <div class="bg-white shadow-md rounded-lg">
+          <nav class="flex flex-col">
+            <a href="/user/account/<%= user._id %>?tab=profile" 
+               class="flex items-center gap-3 p-4 text-left hover:bg-purple-50 transition-colors <%= activeTab === 'profile' ? 'active-tab' : 'text-gray-600' %>">
+              <i data-lucide="user" class="h-5 w-5"></i>
+              <span>My Profile</span>
+            </a>
+            <a href="/user/account/<%= user._id %>?tab=orders" 
+               class="flex items-center gap-3 p-4 text-left hover:bg-purple-50 transition-colors <%= activeTab === 'orders' ? 'active-tab' : 'text-gray-600' %>">
+              <i data-lucide="shopping-cart" class="h-5 w-5"></i>
+              <span>My Orders</span>
+            </a>
+            <a href="/user/account/<%= user._id %>?tab=address" 
+               class="flex items-center gap-3 p-4 text-left hover:bg-purple-50 transition-colors <%= activeTab === 'address' ? 'active-tab' : 'text-gray-600' %>">
+              <i data-lucide="map-pin" class="h-5 w-5"></i>
+              <span>My Addresses</span>
+            </a>
+            <a href="/user/account/<%= user._id %>?tab=password" 
+               class="flex items-center gap-3 p-4 text-left hover:bg-purple-50 transition-colors <%= activeTab === 'password' ? 'active-tab' : 'text-gray-600' %>">
+              <i data-lucide="key" class="h-5 w-5"></i>
+              <span>Change Password</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="md:col-span-9">
+        <div class="bg-white shadow-md rounded-lg min-h-[400px]">
+          <div class="p-6">
+            <% if (activeTab === 'profile') { %>
+              <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Personal Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <p class="text-sm text-gray-500 mb-1">Full Name</p>
+                    <p class="text-gray-800"><%= user.name %></p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500 mb-1">Email Address</p>
+                    <p class="text-gray-800"><%= user.email %></p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500 mb-1">Phone Number</p>
+                    <p class="text-gray-800"><%= user.mobile %></p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500 mb-1">Date Joined</p>
+                    <p class="text-gray-800"><%= user.createdAt %></p>
+                  </div>
+                </div>
+                
+                <% if (defaultAddress) { %>
+                  <div class="mt-8">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Default Address</h3>
+                    <p class="text-gray-800"><%= defaultAddress.streetAddress %></p>
+                    <p class="text-gray-800">
+                      <%= defaultAddress.city %>, <%= defaultAddress.state %> - <%= defaultAddress.pinCode %>
+                    </p>
+                    <p class="text-gray-800"><%= defaultAddress.country %></p>
+                  </div>
+                <% } %>
+                
+                <div class="mt-8">
+                  <a href="/user/account/edit/<%= user._id %>" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md">
+                    <i data-lucide="edit" class="h-4 w-4 mr-2"></i>
+                    Edit Information
+                  </a>
+                </div>
+              </div>
+            <% } %>
+            
+
+            <% if (activeTab === 'orders') { %>
+              <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">My Orders</h3>
+                <% orders.forEach(function(order) { %>
+                  <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                      <div>
+                        <span class="text-sm text-gray-500">Order #</span>
+                        <span class="font-medium ml-2"><%= order.id %></span>
+                      </div>
+                      <div class="bg-purple-100 text-purple-700 text-sm py-1 px-3 rounded-full">
+                        <%= order.status %>
+                      </div>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                      <div>
+                        <span class="text-gray-500">Date: </span>
+                        <span><%= order.date %></span>
+                      </div>
+                      <div>
+                        <span class="text-gray-500">Total: </span>
+                        <span class="font-medium">$<%= order.total.toFixed(2) %></span>
+                      </div>
+                    </div>
+                    <div class="mt-4 flex gap-3">
+                      <a href="/orders/<%= order.id %>/track" class="inline-flex items-center px-3 py-1 text-sm border border-purple-200 text-purple-700 hover:bg-purple-50 rounded-md">
+                        <i data-lucide="package" class="h-4 w-4 mr-2"></i>
+                        Track Order
+                      </a>
+                      <% if (order.status !== 'Delivered') { %>
+                        <a href="/orders/<%= order.id %>/cancel" class="inline-flex items-center px-3 py-1 text-sm border border-red-200 text-red-600 hover:bg-red-50 rounded-md">
+                          Cancel Order
+                        </a>
+                      <% } %>
+                    </div>
+                  </div>
+                <% }); %>
+              </div>
+            <% } %>
+
+            <% if (activeTab === 'address') { %>
+              <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">My Addresses</h3>
+                <% if (!user.addresses || user.addresses.length === 0) { %>
+                  <p class="text-gray-600 text-sm mb-4">You don't have any registered address.</p>
+                  <div class="border border-dashed border-gray-300 rounded-lg p-4 flex items-center justify-center">
+                    <a href="/user/address/new/<%= user._id %>" class="text-purple-700 hover:bg-purple-50 px-4 py-2 rounded-md">
+                      + Add New Address
+                    </a>
+                  </div>
+                <% } else { %>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <% user.addresses.forEach(function(address) { %>
+                      <div class="border border-gray-200 rounded-lg p-4 relative">
+                        <% if (address.isDefault) { %>
+                          <div class="absolute top-4 right-4 bg-purple-100 text-purple-700 text-xs py-1 px-2 rounded">
+                            Default
+                          </div>
+                        <% } %>
+                        <h4 class="font-medium mb-2"><%= address.name %> <span class="text-gray-500 text-sm">(<%= address.addressType %>)</span></h4>
+                        <p class="text-gray-600 text-sm">
+                          <%= address.streetAddress %><br>
+                          <%= address.city %>, <%= address.state %>, <%= address.pinCode %><br>
+                          <%= address.country %><br>
+                          <%= address.phone %>
+                        </p>
+                        <div class="mt-4 flex gap-2">
+                          <a href="/user/address/<%= address.id %>/edit" class="inline-flex items-center px-3 py-1 text-sm border border-purple-200 text-purple-700 hover:bg-purple-50 rounded-md">
+                            Edit
+                          </a>
+                          <a href="/addresses/<%= address.id %>/delete" class="inline-flex items-center px-3 py-1 text-sm text-gray-500 rounded-md">
+                            Delete
+                          </a>
+                          <% if (!address.isDefault) { %>
+                            <a href="/user/address/<%= address.id %>/set-default" class="set-default inline-flex items-center px-3 py-1 text-sm text-purple-700 rounded-md">
+                              Set as Default
+                            </a>
+                          <% } %>
+                        </div>
+                      </div>
+                    <% }); %>
+                    <div class="border border-dashed border-gray-300 rounded-lg p-4 flex items-center justify-center">
+                      <a href="/user/address/new/<%= user._id %>" class="text-purple-700 hover:bg-purple-50 px-4 py-2 rounded-md">
+                        + Add New Address
+                      </a>
+                    </div>
+                  </div>
+                <% } %>
+              </div>
+            <% } %>
+
+            <% if (activeTab === 'password') { %>
+              <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Change Password</h3>
+                <form action="/profile/change-password" method="POST" class="max-w-md space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                    <input 
+                      type="password" 
+                      name="currentPassword"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="Enter your current password"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                    <input 
+                      type="password" 
+                      name="newPassword"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="Enter new password"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                    <input 
+                      type="password" 
+                      name="confirmPassword"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="Confirm new password"
+                    >
+                  </div>
+                  <div class="pt-2">
+                    <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md">
+                      Update Password
+                    </button>
+                  </div>
+                  <div class="pt-2">
+                    <a href="/forgot-password" class="text-sm text-purple-600 hover:underline">Forgot your password?</a>
+                  </div>
+                </form>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Initialize Lucide Icons -->
+  <script>
+    lucide.createIcons();
+  </script>
+  
+  <script>
+  
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const defaultLinks = document.querySelectorAll('.set-default');
+  
+  defaultLinks.forEach(link => {
+    link.addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent default link behavior
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to set this address as default?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, set it!',
+        cancelButtonText: 'No, cancel!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Use fetch with the PATCH method to call your endpoint
+          fetch(this.href, {
+            method: 'PATCH'
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Success',
+                  text: data.message
+                }).then(() => {
+                  // Reload the page or update the UI as needed
+                  window.location.reload();
+                });
+              } else {
+                throw new Error(data.message || 'Failed to set default');
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'An error occurred'
+              });
+            });
+        }
+      });
+    });
+  });
+});
+
+  </script>
+<%- include('../user/partials/foot') %>
+<%- include('../user/partials/footer') %>
+
+
+

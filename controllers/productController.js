@@ -13,6 +13,8 @@ const loadAddProducts = async (req,res)=>{
             return res.redirect('/admin/login');
         }
 
+        
+
         const brands = await brand.find()
         const categories= await category.find()
         
@@ -70,6 +72,13 @@ const verifyAddProduct=async (req,res)=>{
             return res.status(400).json({
                 success:false,
                 message:"Price must be greater than zero"
+            })
+        }
+
+        if(Number(regularPrice) < Number(salePrice)){
+            return res.status(400).json({
+                success:false,
+                message:"The sale price cannot be higher than the regular price."
             })
         }
         

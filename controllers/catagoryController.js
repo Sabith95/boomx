@@ -22,6 +22,8 @@ const loadCategories = async (req, res) => {
       if(querySearch){
         filter.name = {$regex :new RegExp(querySearch,"i")}
       }
+
+      
         // Fetch all categories from the database so they can be displayed
         const categories = await category.find(filter).sort({createdAt:-1}).skip(skip).limit(limit)
         const totalItems = await category.countDocuments()

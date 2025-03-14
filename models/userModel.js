@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         default:null
     },
+    image:{
+        type:String,
+       default:null
+    },
     googleId: { 
         type: String, 
         unique: true, 
@@ -27,8 +31,17 @@ const userSchema = new mongoose.Schema({
     isListed:{
         type:Boolean,
         default:true
-    }
+    },
+    addresses:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Address'
+    }]
     
-})
+},
+  { timestamps:true,
+    toJSON:{virtuals:true},
+    toObject:{virtuals:true}
+}
+)
 
 module.exports = mongoose.model('User',userSchema)

@@ -17,14 +17,20 @@ const loadSignUp = async (req, res) => {
 
 const sendOtp = async (req, res) => {
   const { name, email, mobile, password } = req.body;
+  let imagePath=''
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
+
+    if(req.file){
+      imagePath = '/uploads/' + req.file.filename
+    }
+
     const otp = otpHelper.generateOtp();
     console.log(otp);
-    const token = otpHelper.generateOtpToken({ name, email, mobile, password }, otp);
+    const token = otpHelper.generateOtpToken({ name, email, mobile, password,imagePath }, otp);
     await otpHelper.sendOtpEmail(email, otp);
     res.json({ message: "Otp sent successfully", token });
     console.log(otp);
@@ -50,6 +56,7 @@ const verifyOtp = async (req, res) => {
       email: decoded.email,
       mobile: decoded.mobile,
       password: hashPassword,
+      image:decoded.imagePath,
     });
    
     

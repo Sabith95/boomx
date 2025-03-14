@@ -38,7 +38,7 @@
                     <i class="fa-solid fa-cart-shopping"></i>
                     <span class="absolute -top-2 -right-2 bg-white text-purple-700 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"></span>
                 </a>
-                <a href="/account" class="hover:text-purple-200 text-xl">
+                <a href="/user/account/<%= user._id %>" class="hover:text-purple-200 text-xl">
                     <i class="fa-regular fa-user"></i>
                 </a>
                 <% if (typeof user !== 'undefined' && user) { %>

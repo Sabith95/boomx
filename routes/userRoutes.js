@@ -5,6 +5,10 @@ const jwt = require('jsonwebtoken');
 const userController = require('../controllers/userController');
 const userProductController=require('../controllers/userProductController')
 const userAuth = require('../middlewares/userAuth')
+const upload = require('../config/multerConfig')
+const userProfileController=require('../controllers/userProfileController')
+const addressController=require('../controllers/addressController')
+const{  validateAddress }= require('../middlewares/validateAddress')
 
 
 
@@ -22,7 +26,9 @@ user_route.get('/auth/google/callback', passport.authenticate('google', {
 
 // Google login callback
 user_route.get('/signup', userController.loadSignUp);
-user_route.post('/send-otp', userController.sendOtp);
+
+
+user_route.post('/send-otp',upload.single('image'), userController.sendOtp);
 user_route.post('/verify-otp', userController.verifyOtp);
 user_route.get('/login',userAuth.redirectIfAuthenticated, userController.loadLogin);
 user_route.post('/login', userController.userVerifyLogin);
@@ -42,5 +48,19 @@ user_route.get('/shope',userAuth.checkUserStatus,userProductController.loadShope
 user_route.get('/view-product/:id',userAuth.checkUserStatus,userProductController.loadViewProduct)
 user_route.get('/categories/:id',userAuth.checkUserStatus,userProductController.loadCategories)
 user_route.get('/logout',userAuth.checkUserStatus,userController.logoutUser)
+
+//profile
+user_route.get('/account/:id',userAuth.checkUserStatus,userProfileController.loadAccount)
+user_route.get('/account/edit/:id',userAuth.checkUserStatus,userProfileController.loadEditProfile)
+user_route.put('/account/edit/:id',userAuth.checkUserStatus,upload.single('image'),userProfileController.editProfile)
+
+//address
+
+user_route.get('/address/new/:id',userAuth.checkUserStatus,addressController.loadAddAddress)
+user_route.post('/address/new/:id',userAuth.checkUserStatus,validateAddress,addressController.verifyAddress)
+user_route.patch('/address/:id/set-default',userAuth.checkUserStatus,addressController.changeDefault)
+user_route.get('/address/:id/edit',userAuth.checkUserStatus,addressController.loadEditAddress)
+user_route.put('/address/:id/edit',userAuth.checkUserStatus,upload.none(),validateAddress,addressController.editAddress)
+
 
 module.exports = user_route;

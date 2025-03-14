@@ -10,7 +10,7 @@
                 <p class="text-gray-600 mt-2">Create your account to get started</p>
             </div>
             
-            <form class="space-y-6" action="/user/signup" method="POST" id="signupForm">
+            <!-- <form class="space-y-6" action="/user/signup" method="POST" id="signupForm">
                 <div>
                     <input type="text" name="name" id="name" placeholder="Full Name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
                     <p id="nameError" class="text-red-500 text-sm mt-1 hidden"></p>
@@ -34,7 +34,40 @@
                 <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">
                     Sign Up
                 </button>
+            </form> -->
+
+
+            <form class="space-y-6" action="/user/signup" method="POST" id="signupForm" enctype="multipart/form-data">
+                <div>
+                    <input type="text" name="name" id="name" placeholder="Full Name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+                    <p id="nameError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <div>
+                    <input type="email" name="email" id="email" placeholder="Email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+                    <p id="emailError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <div>
+                    <input type="text" name="mobile" id="mobile" placeholder="Mobile Number" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+                    <p id="mobileError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <div>
+                    <input type="password" name="password" id="password" placeholder="Password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+                    <p id="passwordError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <div>
+                    <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" required>
+                    <p id="confirmPasswordError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <div>
+                    <label for="image" class="block text-sm font-medium text-gray-700">Profile Picture (Optional)</label>
+                    <input type="file" name="image" id="image" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600" accept="image/*">
+                    <p id="profileImageError" class="text-red-500 text-sm mt-1 hidden"></p>
+                </div>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">
+                    Sign Up
+                </button>
             </form>
+            
 
 
             <!-- Login Link (Smaller Text) -->
@@ -186,10 +219,12 @@
             if (!isValid) return;
 
             try {
+
+                const formData = new FormData(document.getElementById("signupForm"))
+
                 const response = await fetch("/user/send-otp", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ name, email, mobile, password }),
+                    body: formData
                 });
 
                 const result = await response.json();
@@ -270,17 +305,28 @@ document.getElementById("verifyOtpBtn").addEventListener("click", async () => {
 
         
        // Resend OTP
-document.getElementById("resendOtpBtn").addEventListener("click", async () => {
-    const email = document.getElementById("email").value.trim();
-    const name = document.getElementById("name").value.trim();
-    const mobile = document.getElementById("mobile").value.trim();
-    const password = document.getElementById("password").value;
+// document.getElementById("resendOtpBtn").addEventListener("click", async () => {
+//     const email = document.getElementById("email").value.trim();
+//     const name = document.getElementById("name").value.trim();
+//     const mobile = document.getElementById("mobile").value.trim();
+//     const password = document.getElementById("password").value;
 
+//     try {
+//         const response = await fetch("/user/send-otp", {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({ name, email, mobile, password }),
+//         });
+
+
+document.getElementById("resendOtpBtn").addEventListener("click", async () => {
     try {
+        // Use the same form data approach for consistency
+        const formData = new FormData(document.getElementById("signupForm"));
+        
         const response = await fetch("/user/send-otp", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, mobile, password }),
+            body: formData
         });
 
         const result = await response.json();
