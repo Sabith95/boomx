@@ -1,8 +1,6 @@
 <%- include('../user/partials/header') %>
 <%- include('../user/partials/head') %>
 <head>
-  <!-- Include Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
   <style>
@@ -31,7 +29,11 @@
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
           <div class="bg-purple-50 p-6 border-b border-purple-100">
             <div class="flex items-center gap-3">
-              <i data-lucide="map-pin" class="h-6 w-6 text-purple-600"></i>
+              <!-- Map pin SVG icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
               <h2 class="text-xl font-bold text-gray-800">Edit Address</h2>
             </div>
           </div>
@@ -151,12 +153,15 @@
                 >
               </div>
               
-            
-              
               <!-- Action Buttons -->
               <div class="flex gap-4 pt-4">
                 <button type="submit" class="inline-flex items-center px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md">
-                  <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                  <!-- Save SVG icon -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
                   Save Changes
                 </button>
                 <a href="/user/account/<%= user._id %>?tab=address" class="px-6 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">
@@ -170,12 +175,7 @@
     </div>
   </main>
 
-  <!-- Initialize Lucide Icons -->
   <script>
-    lucide.createIcons();
-  </script>
-
-<script>
     // Define the addressForm variable
     const addressForm = document.getElementById("addressForm");
   
@@ -213,6 +213,5 @@
     });
   </script>
   
-
 <%- include('../user/partials/foot') %>
 <%- include('../user/partials/footer') %>

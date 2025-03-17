@@ -1,10 +1,6 @@
 <%- include('../user/partials/header') %>
 <%- include('../user/partials/head') %>
-<head>
-  <!-- Include Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
   <style>
     /* Custom styles can be added here */
     .active-tab {
@@ -31,7 +27,13 @@
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
           <div class="bg-purple-50 p-6 border-b border-purple-100">
             <div class="flex items-center gap-3">
-              <i data-lucide="user-cog" class="h-6 w-6 text-purple-600"></i>
+              <!-- User settings SVG icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
               <h2 class="text-xl font-bold text-gray-800">Edit Profile</h2>
             </div>
           </div>
@@ -78,7 +80,7 @@
                     required
                   >
                 </div>
-                <div>
+                <!-- <div>
                   <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address*</label>
                   <input 
                     type="email" 
@@ -89,7 +91,7 @@
                     placeholder="Enter email address"
                     required
                   >
-                </div>
+                </div> -->
               </div>
               
               <!-- Phone and Date of Birth -->
@@ -111,7 +113,12 @@
               <!-- Action Buttons -->
               <div class="flex gap-4 pt-4">
                 <button type="submit" class="inline-flex items-center px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md">
-                  <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                  <!-- Save icon SVG -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
                   Save Changes
                 </button>
                 <a href="/user/account/<%= user._id %>?tab=profile" class="px-6 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">
@@ -125,21 +132,20 @@
     </div>
   </main>
 
-  <!-- Initialize Lucide Icons -->
-  <script>
-    lucide.createIcons();
-  </script>
+  <!-- Load scripts at the end for better performance -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
 
   <script>
-       document.getElementById("profileForm").addEventListener("submit", async (event) => {
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById("profileForm").addEventListener("submit", async (event) => {
         event.preventDefault();
 
         try {
-          const formData = new FormData(  document.getElementById('profileForm'))
-          const response = await fetch(profileForm.action,{
-            method:'put',
-            body:formData
-          })
+          const formData = new FormData(document.getElementById('profileForm'));
+          const response = await fetch(profileForm.action, {
+            method: 'put',
+            body: formData
+          });
           const data = await response.json();
           
           if (data.success) {
@@ -151,7 +157,7 @@
               window.location.href = '/user/account/<%= user._id %>?tab=profile';
             });
           } else {
-            throw new Error(data.message || 'Failed to update user');
+            throw new Error(data.error || 'Failed to update user');
           }
         } catch (error) {
           console.error('Error:', error);
@@ -161,8 +167,8 @@
             text: error.message || 'Failed to update user'
           });
         }
-
-       })
+      });
+    });
   </script>
 
 <%- include('../user/partials/foot') %>

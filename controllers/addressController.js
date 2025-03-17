@@ -112,7 +112,7 @@ const editAddress =async(req,res)=>{
 
         const id = req.params.id
         const {addressType,name,phone,streetAddress,city,state,pinCode,country} = req.body
-        console.log(req.body);
+        
 
         if(!name || !phone){
             return res.status(400).json({success:false,message:'Missing required fields'})
@@ -152,10 +152,42 @@ const editAddress =async(req,res)=>{
     }
 }
 
+const deleteAddress=async(req,res)=>{
+    try {
+        const id = req.params.id
+        console.log(id);
+        
+
+        const deleteAddress= await Address.findByIdAndDelete(id)
+        
+        if(!deleteAddress){
+            return res.status(400).json({success:false,message:'Address not found'})
+        }
+
+        await User.findByIdAndUpdate(req.user._id,{
+            $pull:{addresses:id}
+        })
+
+        return res.status(200).json({
+            success:true,
+            message:"Address deleted successfully"
+        })
+
+    } catch (error) {
+        
+        console.error("Error deleting address:", error);
+        return res.status(500).json({
+          success: false,
+          message: "Internal server error"
+        });
+    }
+}
+
 module.exports={
     loadAddAddress,
     verifyAddress,
     changeDefault,
     loadEditAddress,
-    editAddress
+    editAddress,
+    deleteAddress
 }

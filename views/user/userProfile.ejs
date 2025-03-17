@@ -1,9 +1,7 @@
 <%- include('../user/partials/header') %>
 <%- include('../user/partials/head') %>
-  <!-- Include Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Move script tags to bottom and use specific version for performance -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
   <style>
     /* Custom styles can be added here */
     .active-tab {
@@ -92,8 +90,16 @@
                     <p class="text-gray-800"><%= user.name %></p>
                   </div>
                   <div>
-                    <p class="text-sm text-gray-500 mb-1">Email Address</p>
-                    <p class="text-gray-800"><%= user.email %></p>
+                    <div class="text-sm text-gray-500 mb-1">Email Address</div>
+                    <div class="flex items-center">
+                      <p class="text-gray-800 mr-2"><%= user.email %></p>
+                      <a href="/user/account/edit-email/<%= user._id %>" class="text-blue-500 hover:text-blue-700 text-sm" aria-label="Edit email">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </a>
+                    </div>
                   </div>
                   <div>
                     <p class="text-sm text-gray-500 mb-1">Phone Number</p>
@@ -193,12 +199,17 @@
                           <%= address.phone %>
                         </p>
                         <div class="mt-4 flex gap-2">
-                          <a href="/user/address/<%= address.id %>/edit" class="inline-flex items-center px-3 py-1 text-sm border border-purple-200 text-purple-700 hover:bg-purple-50 rounded-md">
+                          <a href="/user/address/<%= address.id %>/edit" class=" inline-flex items-center px-3 py-1 text-sm border border-purple-200 text-purple-700 hover:bg-purple-50 rounded-md">
                             Edit
                           </a>
-                          <a href="/addresses/<%= address.id %>/delete" class="inline-flex items-center px-3 py-1 text-sm text-gray-500 rounded-md">
-                            Delete
-                          </a>
+                          <button type="button" 
+                          data-url="/user/address/<%= address.id %>/delete" 
+                          class="delete-address-btn inline-flex items-center px-3 py-1 text-sm text-gray-500 rounded-md">
+                           Delete
+                         </button>
+                  
+                          
+                          
                           <% if (!address.isDefault) { %>
                             <a href="/user/address/<%= address.id %>/set-default" class="set-default inline-flex items-center px-3 py-1 text-sm text-purple-700 rounded-md">
                               Set as Default
@@ -220,42 +231,55 @@
             <% if (activeTab === 'password') { %>
               <div>
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">Change Password</h3>
-                <form action="/profile/change-password" method="POST" class="max-w-md space-y-4">
+                <form action="/user/account/change-password/<%= user._id %>" method="POST" class="max-w-md space-y-4" id="changePasswordForm">
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
                     <input 
                       type="password" 
+                      id="currentPassword"
                       name="currentPassword"
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="Enter your current password"
+                      required
                     >
+                    <div id="currPasswordError" class="error-message" style="color:red; font-size:0.9em;"></div>
                   </div>
+                  
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
                     <input 
                       type="password" 
                       name="newPassword"
+                      id="newPassword"
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="Enter new password"
+                      required
                     >
+                    <div id="newPasswordError" class="error-message" style="color:red; font-size:0.9em;"></div>
                   </div>
+                  
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
                     <input 
                       type="password" 
                       name="confirmPassword"
+                      id="confirmPassword"
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="Confirm new password"
+                      required
                     >
+                    <div id="confirmPasswordError" class="error-message" style="color:red; font-size:0.9em;"></div>
                   </div>
+                  
                   <div class="pt-2">
                     <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md">
                       Update Password
                     </button>
                   </div>
-                  <div class="pt-2">
+                  
+                  <!-- <div class="pt-2">
                     <a href="/forgot-password" class="text-sm text-purple-600 hover:underline">Forgot your password?</a>
-                  </div>
+                  </div> -->
                 </form>
               </div>
             <% } %>
@@ -265,52 +289,204 @@
     </div>
   </main>
 
-  <!-- Initialize Lucide Icons -->
+  <!-- Scripts moved to end of body for better page load performance -->
+  <!-- Load specific version of Lucide for better performance and caching -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+  
+  <!-- Initialize Lucide Icons correctly -->
   <script>
-    lucide.createIcons();
+    // Wait for DOM content to be fully loaded before initializing icons
+    document.addEventListener('DOMContentLoaded', function() {
+      lucide.createIcons();
+    });
   </script>
   
   <script>
-  
-
   document.addEventListener('DOMContentLoaded', () => {
-  const defaultLinks = document.querySelectorAll('.set-default');
-  
-  defaultLinks.forEach(link => {
-    link.addEventListener('click', function(event) {
-      event.preventDefault(); // Prevent default link behavior
+    const defaultLinks = document.querySelectorAll('.set-default');
+    
+    defaultLinks.forEach(link => {
+      link.addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default link behavior
 
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "Do you want to set this address as default?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, set it!',
+          cancelButtonText: 'No, cancel!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Use fetch with the PATCH method to call your endpoint
+            fetch(this.href, {
+              method: 'PATCH'
+            })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+                return response.json();
+              })
+              .then(data => {
+                if (data.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.message
+                  }).then(() => {
+                    // Reload the page or update the UI as needed
+                    window.location.reload();
+                  });
+                } else {
+                  throw new Error(data.message || 'Failed to set default');
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: error.message || 'An error occurred'
+                });
+              });
+          }
+        });
+      });
+    });
+  });
+  
+
+
+  //changing password
+
+    
+    const changePasswordForm=document.getElementById('changePasswordForm')
+    if(changePasswordForm){
+      changePasswordForm.addEventListener('submit',async(e)=>{
+
+e.preventDefault()
+
+
+document.getElementById('currPasswordError').innerText=''
+document.getElementById('newPasswordError').innerText=''
+document.getElementById('confirmPasswordError').innerText=''
+
+
+const currentPassword = document.getElementById('currentPassword').value;
+const newPassword = document.getElementById('newPassword').value;
+const confirmPassword = document.getElementById('confirmPassword').value;
+
+const payload={currentPassword,newPassword,confirmPassword}
+
+try {
+const response = await fetch('/user/account/change-password/<%= user._id %>',{
+   method:"PATCH",
+   headers:{
+    'Content-Type' : 'application/json'
+},
+  body:JSON.stringify(payload)
+})
+
+const result = await response.json()
+
+if (!response.ok) {
+// Loop over the structured errors array and display each error in the proper div
+if (result.errors && Array.isArray(result.errors)) {
+  result.errors.forEach(error => {
+    if (error.param === 'currentPassword') {
+      document.getElementById('currPasswordError').innerText = error.msg;
+    }
+    if (error.param === 'newPassword') {
+      document.getElementById('newPasswordError').innerText = error.msg;
+    }
+    if (error.param === 'confirmPassword') {
+      document.getElementById('confirmPasswordError').innerText = error.msg;
+    }
+  });
+} else {
+  // Fallback in case errors are not structured
+  document.getElementById('currPasswordError').innerText = result.error || 'An error occurred. Please try again.';
+}
+} else {
+// On success, show a Swal alert with an OK button; then redirect to the user profile.
+Swal.fire({
+  icon: 'success',
+  title: 'Password Changed',
+  text: result.message || 'Your password has been changed successfully.',
+  confirmButtonText: 'OK'
+}).then((swalResult) => {
+  if (swalResult.isConfirmed) {
+    window.location.href = '/user/account/<%= user._id %>?tab=profile';
+  }
+});
+}
+} catch (error) {
+console.error('Fetch error:', error);
+Swal.fire({
+icon: 'error',
+title: 'Error',
+text: 'Something went wrong. Please try again later.',
+confirmButtonText: 'OK'
+});
+}
+
+})
+    }
+    
+    
+  
+
+//deletitng address
+
+document.addEventListener('DOMContentLoaded', () => {
+
+
+  const deleteButtons = document.querySelectorAll('.delete-address-btn');
+  
+
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent default button behavior
+      
+
+      const url = this.getAttribute('data-url');
+      
       Swal.fire({
         title: 'Are you sure?',
-        text: "Do you want to set this address as default?",
+        text: "Do you want to delete this address?",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, set it!',
+        confirmButtonText: 'Yes, Delete it',
         cancelButtonText: 'No, cancel!'
       }).then((result) => {
+        console.log("SweetAlert result:", result); // Debug log
         if (result.isConfirmed) {
-          // Use fetch with the PATCH method to call your endpoint
-          fetch(this.href, {
-            method: 'PATCH'
+          // Send a POST request using fetch
+          fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
           })
             .then(response => {
+              console.log("Fetch response:", response); // Debug log
               if (!response.ok) {
                 throw new Error('Network response was not ok');
               }
               return response.json();
             })
             .then(data => {
+              console.log("Data received:", data); // Debug log
               if (data.success) {
                 Swal.fire({
                   icon: 'success',
                   title: 'Success',
                   text: data.message
                 }).then(() => {
-                  // Reload the page or update the UI as needed
                   window.location.reload();
                 });
               } else {
-                throw new Error(data.message || 'Failed to set default');
+                throw new Error(data.message || 'Failed to delete');
               }
             })
             .catch(error => {
@@ -330,6 +506,3 @@
   </script>
 <%- include('../user/partials/foot') %>
 <%- include('../user/partials/footer') %>
-
-
-

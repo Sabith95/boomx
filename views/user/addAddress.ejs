@@ -1,10 +1,6 @@
-
-
-  <%- include('../user/partials/header') %>
+<%- include('../user/partials/header') %>
 <%- include('../user/partials/head') %>
 <head>
-  <!-- Include Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
   <style>
@@ -43,7 +39,12 @@
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
           <div class="bg-purple-50 p-6 border-b border-purple-100">
             <div class="flex items-center gap-3">
-              <i data-lucide="plus-circle" class="h-6 w-6 text-purple-600"></i>
+              <!-- Use SVG directly instead of data-lucide -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-purple-600">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+              </svg>
               <h2 class="text-xl font-bold text-gray-800">Add New Address</h2>
             </div>
           </div>
@@ -167,9 +168,15 @@
                 </label>
               </div>
               
-              <!-- Action Buttons -->
+              <!-- Action Buttons with direct SVG icon -->
               <div class="flex gap-4 pt-4">
-                <button type="submit" class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md">
+                <button type="submit" class="inline-flex items-center px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md">
+                  <!-- Save icon SVG -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
                   Save Address
                 </button>
                 <a href="/user/account/<%= user._id %>?tab=address" class="px-6 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">
@@ -182,11 +189,6 @@
       </div>
     </div>
   </main>
-
-  <!-- Initialize Lucide Icons -->
-  <script>
-    lucide.createIcons();
-  </script>
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -251,10 +253,7 @@
       console.error("Address form not found!");
     }
   });
-  </script>
-  
+</script>
 
 <%- include('../user/partials/foot') %>
 <%- include('../user/partials/footer') %>
-
-  

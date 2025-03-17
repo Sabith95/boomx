@@ -9,6 +9,9 @@ const upload = require('../config/multerConfig')
 const userProfileController=require('../controllers/userProfileController')
 const addressController=require('../controllers/addressController')
 const{  validateAddress }= require('../middlewares/validateAddress')
+const {validateInfo} = require('../middlewares/validateInfo')
+const {validateEmail}= require('../middlewares/validateEmail')
+
 
 
 
@@ -52,8 +55,17 @@ user_route.get('/logout',userAuth.checkUserStatus,userController.logoutUser)
 //profile
 user_route.get('/account/:id',userAuth.checkUserStatus,userProfileController.loadAccount)
 user_route.get('/account/edit/:id',userAuth.checkUserStatus,userProfileController.loadEditProfile)
-user_route.put('/account/edit/:id',userAuth.checkUserStatus,upload.single('image'),userProfileController.editProfile)
+user_route.put('/account/edit/:id',userAuth.checkUserStatus,upload.single('image'),validateInfo,userProfileController.editProfile)
 
+//edit email
+user_route.get('/account/edit-email/:id',userAuth.checkUserStatus,userProfileController.loadEditEmail)
+user_route.patch('/account/edit-email/send-otp/:id',userAuth.checkUserStatus,validateEmail,userProfileController.sendOtp)
+user_route.get('/account/edit-email/verify-otp/:id',userAuth.checkUserStatus,userProfileController.loadOtp)
+user_route.patch('/account/edit-email/verify-otp/:id',userAuth.checkUserStatus,userProfileController.verifyOtp)
+
+// change password
+
+user_route.patch('/account/change-password/:id',userAuth.checkUserStatus,userProfileController.changePassword)
 //address
 
 user_route.get('/address/new/:id',userAuth.checkUserStatus,addressController.loadAddAddress)
@@ -61,6 +73,8 @@ user_route.post('/address/new/:id',userAuth.checkUserStatus,validateAddress,addr
 user_route.patch('/address/:id/set-default',userAuth.checkUserStatus,addressController.changeDefault)
 user_route.get('/address/:id/edit',userAuth.checkUserStatus,addressController.loadEditAddress)
 user_route.put('/address/:id/edit',userAuth.checkUserStatus,upload.none(),validateAddress,addressController.editAddress)
+user_route.post('/address/:id/delete',userAuth.checkUserStatus,addressController.deleteAddress)
+
 
 
 module.exports = user_route;
