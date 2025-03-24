@@ -1,0 +1,553 @@
+<%- include('../user/partials/header') %>
+<%- include('../user/partials/head') %>
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Checkout</h1>
+    
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Left Column - Address and Payment -->
+      <div class="w-full lg:w-2/3 space-y-6">
+        <!-- Address Selection -->
+        <div class="bg-white rounded-lg shadow-md">
+          <div class="px-6 py-4 border-b flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-800">Shipping Address</h2>
+            <button id="showAddressFormBtn" class="px-3 py-1 border border-gray-300 rounded-md text-sm flex items-center gap-1 hover:bg-gray-50">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-plus">
+                <path d="M5 12h14"/>
+                <path d="M12 5v14"/>
+              </svg>
+              Add New Address
+            </button>
+          </div>
+          
+          <!-- Inline Add New Address Form (positioned just below the button) -->
+          <div id="newAddressForm" class="px-6 pt-4 pb-6 border-b bg-gray-50" style="display: none;">
+            <form id="addAddressForm" action="/user/address/new/<%= user._id %>" method="post">
+              <div class="grid grid-cols-1 gap-4">
+                <div>
+                  <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                  <input type="text" name="name" id="name" required 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                  <label for="addressType" class="block text-sm font-medium text-gray-700">Address Type</label>
+                  <select name="addressType" id="addressType" required 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                    <option value="Home">Home</option>
+                    <option value="Office">Office</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="streetAddress" class="block text-sm font-medium text-gray-700">Street Address</label>
+                  <input type="text" name="streetAddress" id="streetAddress" required 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                  <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+                  <input type="text" name="city" id="city" required 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                  <label for="state" class="block text-sm font-medium text-gray-700">State</label>
+                  <input type="text" name="state" id="state" required 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+                    <input type="text" name="country" id="country" required 
+                      class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                  </div>
+                <div>
+                  <label for="pinCode" class="block text-sm font-medium text-gray-700">Pin Code</label>
+                  <input type="text" name="pinCode" id="pinCode" required 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                  <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+                  <input type="tel" name="phone" id="phone" required 
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                </div>
+                <!-- Default Address Checkbox -->
+                <div class="flex items-center">
+                  <input 
+                    type="checkbox" 
+                    id="isDefault"
+                    name="isDefault" 
+                    class="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                  >
+                  <label for="isDefault" class="ml-2 block text-sm text-gray-700">
+                    Set as default address
+                  </label>
+                </div>
+                <div class="flex justify-end gap-2">
+                  <button type="button" id="cancelAddressBtn" class="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">Cancel</button>
+                  <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">Save Address</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <!-- End Inline Add New Address Form -->
+          
+          <div class="p-6">
+            <div class="space-y-4">
+              <% addresses.forEach(function(address) { %>
+                <div class="relative flex items-start border rounded-lg p-4 <%= selectedAddressId === address.id ? 'border-purple-600 bg-purple-50' : 'border-gray-200' %>">
+                  <input 
+                    type="radio" 
+                    name="address" 
+                    id="address-<%= address.id %>" 
+                    value="<%= address.id %>" 
+                    <%= selectedAddressId === address.id ? 'checked' : '' %>
+                    class="h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500 absolute top-4 left-4"
+                  >
+                  <div class="ml-8 space-y-2 w-full">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <p class="font-medium"><%= address.name %>(<%= address.addressType %>)</p>
+                        <% if (address.isDefault) { %>
+                          <span class="inline-flex items-center text-xs font-medium text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full mt-1">
+                            Default
+                          </span>
+                        <% } %>
+                      </div>
+                      <button class="editAddressBtn text-purple-600 text-sm py-1 hover:underline" data-address-id="<%= address.id %>">
+                        Edit
+                      </button>
+                    </div>
+                    <p class="text-gray-600"><%= address.streetAddress %></p>
+                    <p class="text-gray-600"><%= address.city %>, <%= address.state %> <%= address.pinCode %></p>
+                    <p class="text-gray-600">Phone: <%= address.phone %></p>
+                  </div>
+                </div>
+                <!-- Inline Edit Address Form for this address (hidden by default) -->
+                <div id="editAddressForm-<%= address.id %>" class="editAddressForm hidden px-6 pt-4 pb-6 border-t bg-gray-50">
+                  <form class="editAddressFormForm" action="/user/address/<%= address.id %>/edit" method="post">
+                    <div class="grid grid-cols-1 gap-4">
+                      <div>
+                        <label for="edit-name-<%= address.id %>" class="block text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" name="name" id="edit-name-<%= address.id %>" required value="<%= address.name %>"
+                          class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                      </div>
+                      <div>
+                        <label for="edit-addressType-<%= address.id %>" class="block text-sm font-medium text-gray-700">Address Type</label>
+                        <select name="addressType" id="edit-addressType-<%= address.id %>" required
+                          class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                          <option value="Home" <%= address.addressType === 'Home' ? 'selected' : '' %>>Home</option>
+                          <option value="Office" <%= address.addressType === 'Office' ? 'selected' : '' %>>Office</option>
+                          <option value="Other" <%= address.addressType === 'Other' ? 'selected' : '' %>>Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label for="edit-streetAddress-<%= address.id %>" class="block text-sm font-medium text-gray-700">Street Address</label>
+                        <input type="text" name="streetAddress" id="edit-streetAddress-<%= address.id %>" required value="<%= address.streetAddress %>"
+                          class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                      </div>
+                      <div>
+                        <label for="edit-city-<%= address.id %>" class="block text-sm font-medium text-gray-700">City</label>
+                        <input type="text" name="city" id="edit-city-<%= address.id %>" required value="<%= address.city %>"
+                          class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                      </div>
+                      <div>
+                        <label for="edit-state-<%= address.id %>" class="block text-sm font-medium text-gray-700">State</label>
+                        <input type="text" name="state" id="edit-state-<%= address.id %>" required value="<%= address.state %>"
+                          class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                      </div>
+                      <div>
+                        <label for="edit-pinCode-<%= address.id %>" class="block text-sm font-medium text-gray-700">Pin Code</label>
+                        <input type="text" name="pinCode" id="edit-pinCode-<%= address.id %>" required value="<%= address.pinCode %>"
+                          class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                      </div>
+                      <div>
+                        <label for="edit-country-<%= address.id %>" class="block text-sm font-medium text-gray-700">Country</label>
+                        <input type="text" name="country" id="edit-country-<%= address.id %>" required value="<%= address.country %>"
+                          class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                      </div>
+                      <div>
+                        <label for="edit-phone-<%= address.id %>" class="block text-sm font-medium text-gray-700">Phone</label>
+                        <input type="tel" name="phone" id="edit-phone-<%= address.id %>" required value="<%= address.phone %>"
+                          class="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500">
+                      </div>
+                     
+                      <div class="flex justify-end gap-2">
+                        <button type="button" class="cancelEditAddressBtn px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100" data-address-id="<%= address.id %>">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">Save Changes</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <!-- End Inline Edit Address Form -->
+              <% }); %>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Payment Method -->
+        <div class="bg-white rounded-lg shadow-md">
+          <div class="px-6 py-4 border-b">
+            <h2 class="text-xl font-semibold text-gray-800">Payment Method</h2>
+          </div>
+          <div class="p-6">
+            <div class="space-y-4">
+              <div class="relative flex items-start border rounded-lg p-4 <%= paymentMethod === 'cod' ? 'border-purple-600 bg-purple-50' : 'border-gray-200' %>">
+                <input 
+                  type="radio" 
+                  name="payment" 
+                  id="payment-cod" 
+                  value="cod" 
+                  <%= paymentMethod === 'cod' ? 'checked' : '' %>
+                  class="h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500 absolute top-4 left-4"
+                >
+                <div class="ml-8">
+                  <label for="payment-cod" class="font-medium cursor-pointer">
+                    Cash on Delivery
+                  </label>
+                  <p class="text-sm text-gray-500">Pay when your order is delivered</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Place Order Button (Mobile) -->
+        <div class="lg:hidden">
+          <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-md text-lg">
+            Place Order
+          </button>
+        </div>
+      </div>
+      
+      <!-- Right Column - Order Summary -->
+      <div class="w-full lg:w-1/3">
+        <div class="bg-white rounded-lg shadow-md p-6 sticky top-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-6 pb-2 border-b">Order Summary</h2>
+          
+          <div class="space-y-4 mb-6">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Subtotal (<%= cartItems ? cartItems.length : 0 %> items)</span>
+              <span class="font-medium">₹<%= subtotal ? subtotal.toFixed(2) : '0.00' %></span>
+            </div>
+            
+            <div class="flex justify-between">
+              <span class="text-gray-600">Tax</span>
+              <span class="font-medium">₹<%= tax ? tax.toFixed(2) : '0.00' %></span>
+            </div>
+            
+            <div class="flex justify-between">
+              <span class="text-gray-600">Shipping</span>
+              <span class="font-medium">₹<%= subtotal && subtotal >= 299999 ? '0.00' : '0.00' %></span>
+            </div>
+            
+            <div class="flex justify-between">
+              <span class="text-gray-600">Estimated Delivery</span>
+              <span class="font-medium text-green-600">3-5 business days</span>
+            </div>
+            
+            <div class="border-t pt-4 mt-4">
+              <div class="flex justify-between">
+                <span class="text-lg font-semibold">Total</span>
+                <span class="text-lg font-bold text-purple-600">₹<%= total ? total.toFixed(2) : '0.00' %></span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Order Items -->
+          <div class="space-y-4 mb-6">
+            <h3 class="font-medium text-gray-800">Items in Your Order</h3>
+            <% if (cartItems && cartItems.length > 0) { %>
+              <% cartItems.forEach(function(item) { %>
+                <div class="flex gap-3">
+                  <img 
+                    src="<%= item.product.image[0] %>" 
+                    alt="<%= item.product.name %>" 
+                    class="w-16 h-16 object-cover rounded-md"
+                  >
+                  <div class="flex-1">
+                    <p class="font-medium text-sm"><%= item.product.name %></p>
+                    <p class="text-gray-500 text-sm">Qty: <%= item.quantity %></p>
+                    <p class="text-purple-600 font-medium">₹<%= item.priceAddition.toFixed(2) %></p>
+                  </div>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <p class="text-gray-500">No items in cart</p>
+            <% } %>
+          </div>
+          
+          <!-- Place Order Button (Desktop) -->
+          <div class="hidden lg:block">
+            <button id="placeOrderBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-md text-lg">
+              Place Order
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const showAddressFormBtn = document.getElementById('showAddressFormBtn');
+      const newAddressForm = document.getElementById('newAddressForm');
+      const cancelAddressBtn = document.getElementById('cancelAddressBtn');
+      const addAddressForm = document.getElementById('addAddressForm');
+  
+      if (!showAddressFormBtn || !newAddressForm || !addAddressForm) {
+        console.error("One or more elements not found. Ensure IDs are correct.");
+        return;
+      }
+  
+      // Toggle the form when clicking "Add New Address"
+      showAddressFormBtn.addEventListener('click', function() {
+        console.log("Add New Address clicked");
+        newAddressForm.style.setProperty('display', 'block', 'important');
+      });
+  
+      // Hide the form if cancel is clicked
+      if (cancelAddressBtn) {
+        cancelAddressBtn.addEventListener('click', function() {
+          newAddressForm.style.setProperty('display', 'none', 'important');
+        });
+      }
+  
+      // Handle new address form submission via AJAX
+      addAddressForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+  
+        const formData = {
+          name: document.getElementById('name').value,
+          addressType: document.getElementById('addressType').value,
+          streetAddress: document.getElementById('streetAddress').value,
+          city: document.getElementById('city').value,
+          state: document.getElementById('state').value,
+          country: document.getElementById('country').value,
+          pinCode: document.getElementById('pinCode').value,
+          phone: document.getElementById('phone').value,
+          isDefault: document.getElementById('isDefault').checked,
+        };
+  
+        fetch('/user/address/new/<%= user._id %>', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Address added successfully',
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            if (data.error && Array.isArray(data.error)) {
+              const errorMsg = data.error.join('<br>');
+              Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: errorMsg,
+              });
+            } else {
+              throw new Error(data.message || 'Error adding address');
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.message || 'Error adding address',
+          });
+        });
+      });
+  
+      // Toggle inline edit forms
+      document.querySelectorAll('.editAddressBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const addressId = this.getAttribute('data-address-id');
+          const editForm = document.getElementById(`editAddressForm-${addressId}`);
+          if (editForm.classList.contains('hidden')) {
+            editForm.classList.remove('hidden');
+            editForm.style.display = 'block';
+          } else {
+            editForm.classList.add('hidden');
+            editForm.style.display = 'none';
+          }
+        });
+      });
+  
+      // Hide inline edit forms when cancel is clicked
+      document.querySelectorAll('.cancelEditAddressBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const addressId = this.getAttribute('data-address-id');
+          const editForm = document.getElementById(`editAddressForm-${addressId}`);
+          editForm.classList.add('hidden');
+          editForm.style.display = 'none';
+        });
+      });
+  
+    });
+
+
+    document.querySelectorAll('.editAddressFormForm').forEach(form => {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    
+    try {
+      const formData = new FormData(form);
+      const response = await fetch(form.action, {
+        method: 'PUT',
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: data.message
+        }).then(() => {
+          window.location.reload()
+        });
+      } else {
+        throw new Error(data.error || 'Failed to update address');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || 'Failed to update address'
+      });
+    }
+  });
+});
+
+
+// checkout
+
+<%# Make sure the button exists in the DOM %>
+<% if (typeof paymentMethod !== 'undefined' && cartItems && cartItems.length > 0) { %>
+  document.addEventListener('DOMContentLoaded', function() {
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+    
+    if (placeOrderBtn) {
+      placeOrderBtn.addEventListener('click', function(event) {
+        // Prevent default form submission behavior
+        event.preventDefault();
+        
+        // Get the selected address; if none is selected, we'll send null and let the backend handle it
+        const selectedAddress = document.querySelector('input[name="address"]:checked');
+        
+        // Check if address is required but not selected
+        <% if (typeof requireAddress !== 'undefined' && requireAddress) { %>
+          if (!selectedAddress) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Address Required',
+              text: 'Please select a delivery address'
+            });
+            return;
+          }
+        <% } %>
+        
+        // Safely serialize data with error handling
+        let cartItemsJson = [];
+        try {
+          <% if (typeof cartItems !== 'undefined') { %>
+            cartItemsJson = <%- JSON.stringify(cartItems || []) %>;
+          <% } %>
+        } catch (e) {
+          console.error('Error parsing cart items:', e);
+          cartItemsJson = [];
+        }
+        
+        // Prepare order data to be passed to the backend
+        const orderData = {
+          addressId: selectedAddress ? selectedAddress.value : null,
+          paymentMethod: '<%= typeof paymentMethod !== "undefined" ? paymentMethod : "cod" %>',
+          cartItems: cartItemsJson,
+          subtotal: <%= typeof subtotal !== 'undefined' ? subtotal : 0 %>,
+          tax: <%= typeof tax !== 'undefined' ? tax : 0 %>,
+          total: <%= typeof total !== 'undefined' ? total : 0 %>
+        };
+        
+        // Disable button to prevent multiple submissions
+        placeOrderBtn.disabled = true;
+        placeOrderBtn.innerHTML = 'Processing...';
+        
+        // Send order data to backend via POST request
+        fetch('/user/order', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(orderData)
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Server returned status: ' + response.status);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log("Received order data:", data);
+          if(data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Order Placed!',
+              text: 'Your order has been placed successfully.'
+            }).then(() => {
+              console.log('orderId',data.orderId)
+              window.location.href = '/user/order/confirmation/' + data.orderId;
+             
+            });
+          } else {
+            // Re-enable button on error
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.innerHTML = 'Place Order';
+            
+            // Show error returned by backend
+            Swal.fire({
+              icon: 'error',
+              title: 'Order Error',
+              text: data.message || 'Error placing order'
+            });
+          }
+        })
+        .catch(error => {
+          // Re-enable button on error
+          placeOrderBtn.disabled = false;
+          placeOrderBtn.innerHTML = 'Place Order';
+          
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Order Error',
+            text: error.message || 'Error placing order'
+          });
+        });
+      });
+    } else {
+      console.error('Place order button not found in the DOM');
+    }
+  });
+<% } %>
+
+  </script>
+
+
+<%- include('../user/partials/foot') %>
+<%- include('../user/partials/footer') %>

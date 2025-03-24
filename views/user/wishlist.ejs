@@ -1,0 +1,163 @@
+<%- include('../user/partials/header') %>
+<%- include('../user/partials/head') %>
+
+<div class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">My Wishlist</h1>
+      <p class="text-gray-600 mt-2">Keep track of all your favorite items</p>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-100">
+      <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+        <div>
+          <h2 class="text-xl font-semibold text-gray-800">Your Saved Items</h2>
+          <!-- <p class="text-gray-500"><span id="wishlist-count">4</span> items in your wishlist</p> -->
+        </div>
+        <div class="mt-4 md:mt-0">
+            <a href="/user/shope" class=" text-purple-600 px-4 py-2 rounded-md transition inline-flex items-center">
+              Continue Shopping
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
+      </div>
+      
+      <!-- Wishlist Items -->
+      <div class="space-y-6">
+        <% wishlistItems.forEach(item => { %>
+          <div class="flex flex-col md:flex-row border-b border-gray-200 pb-6">
+            <div class="w-full md:w-1/5 mb-4 md:mb-0">
+              <div class="h-32 w-32 overflow-hidden rounded-md bg-gray-100">
+                <img src="<%= item.image[0] %>" alt="<%= item.name %>" class="w-full h-full object-contain">
+              </div>
+            </div>
+            <div class="w-full md:w-3/5 md:px-6">
+              <h3 class="text-lg font-semibold text-gray-800"><%= item.name %></h3>
+              <!-- <p class="text-gray-600 mt-2"><%= item.description %></p> -->
+              <div class="mt-4 flex items-center">
+                <span class="text-purple-600 font-bold">₹<%= item.salePrice.toFixed(2) %></span>
+                <% if (item.regularPrice) { %>
+                  <span class="ml-2 text-gray-400 line-through">$<%= item.regularPrice.toFixed(2) %></span>
+                <% } %>
+                <% if (item.quantity > 0) { %>
+                  <span class="ml-4 text-amber-600 text-sm">Only <%= item.quantity %> left!</span>
+                <% } else if (item.quantity === 0) { %>
+                  <span class="ml-4 text-red-500 text-sm">Out of stock</span>
+                <% } %>
+              </div>
+            </div>
+            <div class="w-full md:w-1/5 flex flex-col justify-between items-start md:items-end mt-4 md:mt-0">
+              <div class="flex space-x-2">
+                <a href="/user/view-product/<%= item.id %>">
+                  <button class="bg-gray-100 hover:bg-purple-200 text-purple-700 p-2 rounded-full transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                  </button>
+                </a>
+                
+                <button type="button"
+                data-url="/user/wishlist/delete/<%=item.id %>"
+                class="delete-wishlist bg-gray-100 hover:bg-purple-200 text-purple-700 p-2 rounded-full transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+      
+      <!-- Empty Wishlist State -->
+      <% if (wishlistItems.length === 0) { %>
+        <div class="text-center py-12">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+          <h3 class="mt-4 text-xl font-semibold text-purple-800">Your wishlist is empty</h3>
+          <p class="mt-2 text-gray-500">Browse our products and add your favorites to your wishlist</p>
+          <!-- <button class="mt-6 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-md transition">Start Shopping</button> -->
+        </div>
+      <% } %>
+    </div>
+    
+    
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+
+
+<script>
+//delete wishlist
+
+document.addEventListener('DOMContentLoaded', () => {
+
+
+const deleteButtons = document.querySelectorAll('.delete-wishlist');
+
+
+deleteButtons.forEach(button => {
+  button.addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default button behavior
+    
+
+    const url = this.getAttribute('data-url');
+    
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to delete this wishlist?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete it',
+      cancelButtonText: 'No, cancel!'
+    }).then((result) => {
+      console.log("SweetAlert result:", result); // Debug log
+      if (result.isConfirmed) {
+        // Send a POST request using fetch
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        })
+          .then(response => {
+            console.log("Fetch response:", response); // Debug log
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: data.message
+              }).then(() => {
+                window.location.reload();
+              });
+            } else {
+              throw new Error(data.message || 'Failed to delete');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: error.message || 'An error occurred'
+            });
+          });
+      }
+    });
+  });
+});
+});
+
+</script>
+
+
+<%- include('../user/partials/foot') %>
+<%- include('../user/partials/footer') %>

@@ -1,0 +1,328 @@
+<%- include('../user/partials/header') %>
+<%- include('../user/partials/head') %>
+
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Shopping Cart</h1>
+  
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Cart Items -->
+    <div class="w-full lg:w-2/3">
+      <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+        <% if (cartItems && cartItems.length > 0) { %>
+          <div class="space-y-6">
+            <% cartItems.forEach(item => { %>
+              <div class="flex flex-col sm:flex-row border-b pb-6 hover:bg-gray-50 rounded-lg p-4 transition duration-200">
+                <!-- Product Image -->
+                <div class="w-full sm:w-1/4 mb-4 sm:mb-0 flex justify-center sm:justify-start">
+                  <div class="w-32 h-32 overflow-hidden rounded-lg shadow-sm border border-gray-200">
+                    <img 
+                      src="<%= item.product.image[0] %>" 
+                      alt="<%= item.product.name %>" 
+                      class="w-full h-full object-contain bg-white"
+                      onerror="this.onerror=null; this.src='/images/placeholder.jpg';"
+                    >
+                  </div>
+                </div>
+                
+                <!-- Product Details -->
+                <div class="w-full sm:w-3/4 sm:pl-6 flex flex-col relative">
+                  <div>
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <h3 class="font-medium text-lg text-gray-800"><%= item.product.name %></h3>
+                        
+                        <% if (item.variant) { %>
+                          <p class="text-sm text-gray-600 mb-1"><%= item.variant %></p>
+                        <% } %>
+                        <div class="flex items-center gap-2 mb-1">
+                          <span class="text-purple-600 font-semibold">₹<%= item.priceAddition.toFixed(2) %></span>
+                          <% if (item.product.regularPrice) { %>
+                            <span class="text-gray-500 text-sm line-through">₹<%= item.product.regularPrice.toFixed(2) %></span>
+                            <% if (item.product.regularPrice > item.priceAddition) { %>
+                              <span class="text-green-600 text-xs font-medium bg-green-50 px-2 py-0.5 rounded">
+                                <%= Math.round((1 - item.priceAddition / item.product.regularPrice) * 100) %>% OFF
+                              </span>
+                            <% } %>
+                          <% } %>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2 line-clamp-2"><%= item.product.description || 'Product description not available.' %></p>
+                      </div>
+                      
+                      <button type="button"
+                      data-url="/user/cart/remove/<%=item.product._id %>"
+                       class="remove-cart text-red-500 hover:text-red-700 flex items-center text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-auto pt-4">
+                    <div class="flex items-center mb-3 sm:mb-0">
+                      <span class="text-gray-600 mr-3 text-sm">Quantity:</span>
+                      <div class="flex items-center border border-gray-300 rounded-md">
+                        <button class="px-2 py-0.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-l-md" 
+                                onclick="updateQuantity('<%= item._id %>', 'decrease')">-</button>
+                        <input type="number" 
+                               id="quantity-<%= item._id %>" 
+                               value="<%= item.quantity %>" 
+                               data-max-stock="<%= item.product.quantity %>" 
+                               data-max-allowed="5"
+                               class="w-10 text-center border-x border-gray-300 py-0.5 text-sm" 
+                               readonly>
+                        <button class="px-2 py-0.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-r-md" 
+                                onclick="updateQuantity('<%= item._id %>', 'increase')">+</button>
+                      </div>
+                    </div>
+                    
+                    <div class="font-semibold text-gray-800">
+                      Total: <span class="text-purple-600">₹<%= (item.priceAddition * item.quantity).toFixed(2) %></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="py-16 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <p class="text-xl text-gray-500 mb-4">Your cart is empty</p>
+          </div>
+        <% } %>
+      </div>
+      
+      <div class="flex justify-between items-center mt-6">
+        <a href="/user/shope" class="text-purple-600 hover:text-purple-800 flex items-center transition duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Continue Shopping
+        </a>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="w-full lg:w-1/3">
+      <div class="bg-white rounded-lg shadow-md p-6 sticky top-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6 pb-2 border-b">Order Summary</h2>
+        
+        <div class="space-y-4 mb-6">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Subtotal (<%= cartItems ? cartItems.length : 0 %> items)</span>
+            <span class="font-medium">₹<%= subtotal ? subtotal.toFixed(2) : '0.00' %></span>
+          </div>
+          
+          <div class="flex justify-between">
+            <span class="text-gray-600">Tax</span>
+            <span class="font-medium">₹<%= tax ? tax.toFixed(2) : '0.00' %></span>
+          </div>
+          
+          <!-- Shipping section -->
+          <div class="flex justify-between">
+            <span class="text-gray-600">Shipping</span>
+            <span class="font-medium">₹<%= subtotal && subtotal >= 299999 ? '0.00' : '0.00' %></span>
+          </div>
+          
+          <!-- Delivery section -->
+          <div class="flex justify-between">
+            <span class="text-gray-600">Estimated Delivery</span>
+            <span class="font-medium text-green-600">3-5 business days</span>
+          </div>
+          
+          <div class="border-t pt-4 mt-4">
+            <div class="flex justify-between">
+              <span class="text-lg font-semibold">Total</span>
+              <span class="text-lg font-bold text-purple-600">₹<%= total ? total.toFixed(2) : '0.00' %></span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Checkout Button - Moved here from individual product cards -->
+        <% if (cartItems && cartItems.length > 0) { %>
+          <button 
+            id="checkout-all-btn" 
+            onclick="proceedToCheckout()" 
+            class="w-full py-3 bg-purple-600 text-white font-medium rounded-md hover:bg-purple-700 transition duration-200 flex items-center justify-center shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+            Proceed to Checkout
+          </button>
+        <% } else { %>
+          <button 
+            class="w-full py-3 bg-purple-400 text-white font-medium rounded-md cursor-not-allowed shadow-md opacity-60">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+            Proceed to Checkout
+          </button>
+        <% } %>
+        
+        <div class="mt-4 text-center text-sm text-gray-500">
+          <p>Free shipping on orders over ₹299999</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+
+<script>
+  //delete cart
+  document.addEventListener('DOMContentLoaded', () => {
+    const deleteButtons = document.querySelectorAll('.remove-cart');
+
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default button behavior
+        
+        const url = this.getAttribute('data-url');
+        
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "Do you want to delete this cart item?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, Delete it',
+          cancelButtonText: 'No, cancel!'
+        }).then((result) => {
+          console.log("SweetAlert result:", result); // Debug log
+          if (result.isConfirmed) {
+            // Send a POST request using fetch
+            fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            })
+              .then(response => {
+                console.log("Fetch response:", response); // Debug log
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+                return response.json();
+              })
+              .then(data => {
+                if (data.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.message
+                  }).then(() => {
+                    window.location.reload();
+                  });
+                } else {
+                  throw new Error(data.message || 'Failed to delete');
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: error.message || 'An error occurred'
+                });
+              });
+          }
+        });
+      });
+    });
+  });
+
+  //quantity
+  function updateQuantity(itemId, action) {
+    const quantityInput = document.getElementById(`quantity-${itemId}`)
+    let currentQuantity = parseInt(quantityInput.value)
+
+    const maxStock = parseInt(quantityInput.getAttribute('data-max-stock')) || Infinity
+    const maxAllowed = parseInt(quantityInput.getAttribute('data-max-allowed')) || Infinity
+    const max = Math.min(maxStock, maxAllowed)
+
+    if(action === 'decrease' && currentQuantity > 1) {
+      currentQuantity--
+    }
+    else if(action === 'increase' && currentQuantity < max) {
+      currentQuantity++
+    }
+    else {
+      Toastify({
+        text: "Quantity limit reached.",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        close: true,
+      }).showToast();
+      return;
+    }
+
+    quantityInput.value = currentQuantity
+
+    fetch('/user/cart/update-quantity', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({itemId, quantity: currentQuantity})
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (!data.success) {
+        Toastify({
+          text: "Error: " + data.message,
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+          close: true,
+        }).showToast();
+        // Optionally, revert the UI change if needed.
+      } else {
+        Toastify({
+          text: "Quantity updated successfully!",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+          close: true,
+        }).showToast();
+        
+        setTimeout(() => {
+          window.location.reload();
+        }, 700);
+      }
+    })
+    .catch(error => {
+      console.error("Error updating quantity:", error);
+      Toastify({
+        text: "Error updating quantity: " + error.message,
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        close: true,
+      }).showToast();
+    });
+  }
+
+  // Function to handle checkout for all items
+  function proceedToCheckout() {
+    Swal.fire({
+      title: 'Proceeding to Checkout',
+      text: 'Redirecting to payment page...',
+      icon: 'info',
+      showConfirmButton: false,
+      timer: 1500
+    }).then(() => {
+      window.location.href = '/user/checkout';
+    });
+  }
+</script>
+
+<%- include('../user/partials/foot') %>
+<%- include('../user/partials/footer') %>

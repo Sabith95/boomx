@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const otpHelper = require('../utils/otpHelper');
 const jwt = require('jsonwebtoken');
 const jwtHelper = require('../utils/jwtHelper');
+const Order = require('../models/orderModel')
+const Wallet = require('../models/walletModel')
 
 
 const loadAccount =async(req,res)=>{
@@ -23,7 +25,17 @@ const loadAccount =async(req,res)=>{
                     filter.name ={$regex : new RegExp(querySearch,"i")}
                 }
 
-        res.render('user/userProfile',{user,activeTab,search:querySearch,defaultAddress})
+        const orders = await Order.find({user:id}).sort({createdAt: -1}).populate('items.product')
+        
+        let wallet = await Wallet.findOne({user:id})
+        if(!wallet){
+            wallet = await new Wallet({ user:id, balance: 0 }).save();
+        }
+
+
+        
+
+        res.render('user/userProfile',{user,activeTab,search:querySearch,defaultAddress,orders,wallet})
     } catch (error) {
         console.error(error);
         
@@ -137,7 +149,8 @@ const sendOtp=async(req,res)=>{
         const user=await User.findById(id)
 
         const {email,password} = req.body
-      
+        console.log(req.body);
+        
 
         if(!email || !password){
             return res.status(400).json({success:false,message:"Email and password are required"})

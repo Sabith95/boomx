@@ -68,6 +68,15 @@
               <i data-lucide="map-pin" class="h-5 w-5"></i>
               <span>My Addresses</span>
             </a>
+            <a href="/user/account/<%= user._id %>?tab=wallet" 
+              class="flex items-center gap-3 p-4 text-left hover:bg-purple-50 transition-colors <%= activeTab === 'wallet' ? 'active-tab' : 'text-gray-600' %>">
+             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+               <rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect>
+               <line x1="2" y1="10" x2="22" y2="10"></line>
+               <rect x="16" y="14" width="2" height="2"></rect>
+             </svg>
+             <span>My Wallet</span>
+           </a>
             <a href="/user/account/<%= user._id %>?tab=password" 
                class="flex items-center gap-3 p-4 text-left hover:bg-purple-50 transition-colors <%= activeTab === 'password' ? 'active-tab' : 'text-gray-600' %>">
               <i data-lucide="key" class="h-5 w-5"></i>
@@ -130,8 +139,32 @@
                 </div>
               </div>
             <% } %>
-            
 
+            <% if (activeTab === 'wallet') { %>
+              <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">My Wallet</h3>
+                <div class="bg-white shadow-sm rounded-lg p-6 max-w-md">
+                  <div class="flex items-center justify-between mb-4">
+                    <span class="text-sm text-gray-500">Available Balance</span>
+                    <div class="bg-purple-100 text-purple-700 text-sm py-1 px-3 rounded-full">
+                      Active
+                    </div>
+                  </div>
+                  <div class="flex items-center mb-4">
+                    <span class="text-3xl font-bold text-gray-800">₹<%= wallet.balance || 0 %></span>
+                  </div>
+                  <div class="mt-4 pt-4 border-t border-gray-200">
+                    <!-- <a href="/user/wallet/transactions" class="inline-flex items-center text-sm text-purple-600 hover:text-purple-800">
+                      View transaction history
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </a> -->
+                  </div>
+                </div>
+              </div>
+            <% } %>
+            
             <% if (activeTab === 'orders') { %>
               <div>
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">My Orders</h3>
@@ -140,7 +173,7 @@
                     <div class="flex justify-between items-center mb-2">
                       <div>
                         <span class="text-sm text-gray-500">Order #</span>
-                        <span class="font-medium ml-2"><%= order.id %></span>
+                        <span class="font-medium ml-2"><%= order.orderNumber || order._id %></span>
                       </div>
                       <div class="bg-purple-100 text-purple-700 text-sm py-1 px-3 rounded-full">
                         <%= order.status %>
@@ -149,28 +182,155 @@
                     <div class="flex justify-between items-center text-sm">
                       <div>
                         <span class="text-gray-500">Date: </span>
-                        <span><%= order.date %></span>
+                        <span><%= order.createdAt.toDateString() %></span>
                       </div>
                       <div>
                         <span class="text-gray-500">Total: </span>
-                        <span class="font-medium">$<%= order.total.toFixed(2) %></span>
+                        <span class="font-medium">₹<%= order.total.toFixed(2) %></span>
                       </div>
                     </div>
+                    <div class="mt-4">
+                      <h4 class="text-md font-semibold mb-2">Items:</h4>
+                      <% order.items.forEach(function(item) { %>
+                        <div class="flex justify-between border-b pb-2 mb-2">
+                          <div class="flex-grow">
+                            <span class="font-medium"><%= item.product.name %></span>
+                            <span class="text-sm text-gray-600">x <%= item.quantity %></span>
+                          </div>
+                          <div class="flex items-center gap-3">
+                            <span class="font-medium">₹<%= item.subtotal.toFixed(2) %></span>
+                          </div>
+                        </div>
+                      <% }); %>
+                    </div>
                     <div class="mt-4 flex gap-3">
-                      <a href="/orders/<%= order.id %>/track" class="inline-flex items-center px-3 py-1 text-sm border border-purple-200 text-purple-700 hover:bg-purple-50 rounded-md">
-                        <i data-lucide="package" class="h-4 w-4 mr-2"></i>
-                        Track Order
+                      <a href="/user/order/detail/<%= order.orderNumber || order._id %>" class="inline-flex items-center px-3 py-1 text-sm border border-purple-200 text-purple-700 hover:bg-purple-50 rounded-md">
+                        View Details
                       </a>
-                      <% if (order.status !== 'Delivered') { %>
-                        <a href="/orders/<%= order.id %>/cancel" class="inline-flex items-center px-3 py-1 text-sm border border-red-200 text-red-600 hover:bg-red-50 rounded-md">
-                          Cancel Order
-                        </a>
+                      <% if (order.status === 'Cancelled' || order.status === 'Returned') { %>
+                        <!-- Optionally show a message or nothing at all -->
+                        <p>Order <%= order.status %></p>
+                      <% } else { %>
+                        <% if (order.status !== 'Delivered') { %>
+                          <button 
+                            onclick="openCancelOrderModal('<%= order.orderNumber || order._id %>')"
+                            class="inline-flex items-center px-3 py-1 text-sm border border-red-200 text-red-600 hover:bg-red-50 rounded-md">
+                            Cancel Order
+                          </button>
+                        <% } %>
+                        <% if (order.status === 'Delivered') { %>
+                          <button 
+                            onclick="openReturnOrderModal('<%= order.orderNumber || order._id %>')"
+                            class="inline-flex items-center px-3 py-1 text-sm border border-red-200 text-red-600 hover:bg-red-50 rounded-md">
+                            Return Order
+                          </button>
+                        <% } %>
                       <% } %>
+                      
                     </div>
                   </div>
                 <% }); %>
               </div>
-            <% } %>
+            
+              <!-- Cancel Order Modal -->
+              <div id="cancelOrderModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
+                <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                  <h3 class="text-lg font-medium text-gray-900 mb-4">Cancel Order</h3>
+                  <p class="text-sm text-gray-600 mb-4">Please tell us why you're cancelling this order:</p>
+                  
+                  <form id="cancelOrderForm" action="/user/order/cancel/<%= orders.orderNumber || orders._id  %>" method="POST">
+                    <input type="hidden" id="orderIdToCancel" name="orderId" value="">
+                    
+                    <div class="mb-4">
+                      <div class="flex items-center mb-2">
+                        <input id="reason1" type="radio" name="cancelReason" value="Changed my mind" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                        <label for="reason1" class="ml-2 text-sm text-gray-700">Changed my mind</label>
+                      </div>
+                      <div class="flex items-center mb-2">
+                        <input id="reason2" type="radio" name="cancelReason" value="Found better price elsewhere" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                        <label for="reason2" class="ml-2 text-sm text-gray-700">Found better price elsewhere</label>
+                      </div>
+                      <div class="flex items-center mb-2">
+                        <input id="reason3" type="radio" name="cancelReason" value="Delivery time too long" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                        <label for="reason3" class="ml-2 text-sm text-gray-700">Delivery time too long</label>
+                      </div>
+                      <div class="flex items-center mb-2">
+                        <input id="reason4" type="radio" name="cancelReason" value="Ordered by mistake" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                        <label for="reason4" class="ml-2 text-sm text-gray-700">Ordered by mistake</label>
+                      </div>
+                      <div class="flex items-center">
+                        <input id="reasonOther" type="radio" name="cancelReason" value="other" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                        <label for="reasonOther" class="ml-2 text-sm text-gray-700">Other reason</label>
+                      </div>
+                    </div>
+                    
+                    <div id="otherReasonContainer" class="mb-4 hidden">
+                      <label for="otherReason" class="block text-sm font-medium text-gray-700 mb-1">Please specify:</label>
+                      <textarea id="otherReason" name="otherReason" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end gap-3 mt-6">
+                      <button type="button" onclick="closeCancelOrderModal()" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        Cancel
+                      </button>
+                      <button type="submit" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Confirm Cancellation
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Return Order Modal -->
+<div id="returnOrderModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Return Order</h3>
+    <p class="text-sm text-gray-600 mb-4">Please tell us why you're returning this order:</p>
+    
+    <form id="returnOrderForm" action="/user/order/return/<%= orders.orderNumber || orders._id %>" method="POST">
+      <input type="hidden" id="orderIdToReturn" name="orderId" value="">
+      
+      <div class="mb-4">
+        <div class="flex items-center mb-2">
+          <input id="returnReason1" type="radio" name="returnReason" value="Changed my mind" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+          <label for="returnReason1" class="ml-2 text-sm text-gray-700">Changed my mind</label>
+        </div>
+        <div class="flex items-center mb-2">
+          <input id="returnReason2" type="radio" name="returnReason" value="Defective item" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+          <label for="returnReason2" class="ml-2 text-sm text-gray-700">Defective item</label>
+        </div>
+        <div class="flex items-center mb-2">
+          <input id="returnReason3" type="radio" name="returnReason" value="Wrong item received" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+          <label for="returnReason3" class="ml-2 text-sm text-gray-700">Wrong item received</label>
+        </div>
+        <div class="flex items-center mb-2">
+          <input id="returnReason4" type="radio" name="returnReason" value="Not as described" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+          <label for="returnReason4" class="ml-2 text-sm text-gray-700">Not as described</label>
+        </div>
+        <div class="flex items-center">
+          <input id="returnReasonOther" type="radio" name="returnReason" value="other" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+          <label for="returnReasonOther" class="ml-2 text-sm text-gray-700">Other reason</label>
+        </div>
+      </div>
+      
+      <div id="returnOtherReasonContainer" class="mb-4 hidden">
+        <label for="returnOtherReason" class="block text-sm font-medium text-gray-700 mb-1">Please specify:</label>
+        <textarea id="returnOtherReason" name="otherReason" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"></textarea>
+      </div>
+      
+      <div class="flex justify-end gap-3 mt-6">
+        <button type="button" onclick="closeReturnOrderModal()" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+          Cancel
+        </button>
+        <button type="submit" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          Confirm Return
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+              <% } %>
+
 
             <% if (activeTab === 'address') { %>
               <div>
@@ -303,6 +463,170 @@
   </script>
   
   <script>
+      console.log("Script loaded");
+
+    //cancelling orders
+
+    function openCancelOrderModal(orderId) {
+    document.getElementById('orderIdToCancel').value = orderId;
+    document.getElementById('cancelOrderModal').classList.remove('hidden');
+  }
+  
+  function closeCancelOrderModal() {
+    document.getElementById('cancelOrderModal').classList.add('hidden');
+    document.getElementById('cancelOrderForm').reset();
+    document.getElementById('otherReasonContainer').classList.add('hidden');
+  }
+  
+  
+  // Show/hide "other reason" textarea
+  document.addEventListener('DOMContentLoaded', function() {
+    // For order cancellation
+    var orderRadios = document.querySelectorAll('#cancelOrderForm input[name="cancelReason"]');
+    if (orderRadios) {
+      orderRadios.forEach(function(radio) {
+        radio.addEventListener('change', function() {
+          if (this.value === 'other' && this.checked) {
+            document.getElementById('otherReasonContainer').classList.remove('hidden');
+          } else {
+            document.getElementById('otherReasonContainer').classList.add('hidden');
+          }
+        });
+      });
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    
+  const cancelOrderForm = document.getElementById("cancelOrderForm");
+
+  cancelOrderForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const orderId = document.getElementById("orderIdToCancel").value;
+    const cancelReason = document.querySelector('input[name="cancelReason"]:checked')?.value;
+    const otherReason = document.getElementById("otherReason").value;
+
+    const requestData = {
+      orderId,
+      cancelReason: cancelReason === "other" ? otherReason : cancelReason,
+    };
+
+    try {
+      const response = await fetch(`/user/order/cancel/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Order Canceled",
+          text: data.message,
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        throw new Error(data.error || "Failed to cancel order");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Failed to cancel order",
+      });
+    }
+  });
+});
+  
+ //return order
+
+ 
+// Return order functions
+function openReturnOrderModal(orderId) {
+  document.getElementById('orderIdToReturn').value = orderId;
+  document.getElementById('returnOrderModal').classList.remove('hidden');
+}
+
+function closeReturnOrderModal() {
+  document.getElementById('returnOrderModal').classList.add('hidden');
+  document.getElementById('returnOrderForm').reset();
+  document.getElementById('returnOtherReasonContainer').classList.add('hidden');
+}
+
+// Add event listeners for the radio buttons in return form
+document.addEventListener('DOMContentLoaded', function() {
+  // For return form radio buttons
+  const returnRadios = document.querySelectorAll('#returnOrderForm input[name="returnReason"]');
+  if (returnRadios) {
+    returnRadios.forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        if (this.value === 'other' && this.checked) {
+          document.getElementById('returnOtherReasonContainer').classList.remove('hidden');
+        } else {
+          document.getElementById('returnOtherReasonContainer').classList.add('hidden');
+        }
+      });
+    });
+  }
+  
+  // For return form submission
+  const returnOrderForm = document.getElementById('returnOrderForm');
+  if (returnOrderForm) {
+    returnOrderForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      const orderId = document.getElementById('orderIdToReturn').value;
+      const returnReason = document.querySelector('input[name="returnReason"]:checked')?.value;
+      const otherReason = document.getElementById('returnOtherReason').value;
+      
+      const requestData = {
+        orderId,
+        returnReason: returnReason === 'other' ? otherReason : returnReason
+      };
+      
+      fetch(`/user/order/return/${orderId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Return Requested',
+            text: data.message
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          throw new Error(data.error || 'Failed to request return');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.message || 'Failed to request return'
+        });
+      });
+    });
+  }
+});
+
+
+
+// set default address 
   document.addEventListener('DOMContentLoaded', () => {
     const defaultLinks = document.querySelectorAll('.set-default');
     
@@ -362,78 +686,75 @@
   //changing password
 
     
-    const changePasswordForm=document.getElementById('changePasswordForm')
-    if(changePasswordForm){
-      changePasswordForm.addEventListener('submit',async(e)=>{
-
-e.preventDefault()
-
-
-document.getElementById('currPasswordError').innerText=''
-document.getElementById('newPasswordError').innerText=''
-document.getElementById('confirmPasswordError').innerText=''
-
-
-const currentPassword = document.getElementById('currentPassword').value;
-const newPassword = document.getElementById('newPassword').value;
-const confirmPassword = document.getElementById('confirmPassword').value;
-
-const payload={currentPassword,newPassword,confirmPassword}
-
-try {
-const response = await fetch('/user/account/change-password/<%= user._id %>',{
-   method:"PATCH",
-   headers:{
-    'Content-Type' : 'application/json'
-},
-  body:JSON.stringify(payload)
-})
-
-const result = await response.json()
-
-if (!response.ok) {
-// Loop over the structured errors array and display each error in the proper div
-if (result.errors && Array.isArray(result.errors)) {
-  result.errors.forEach(error => {
-    if (error.param === 'currentPassword') {
-      document.getElementById('currPasswordError').innerText = error.msg;
-    }
-    if (error.param === 'newPassword') {
-      document.getElementById('newPasswordError').innerText = error.msg;
-    }
-    if (error.param === 'confirmPassword') {
-      document.getElementById('confirmPasswordError').innerText = error.msg;
-    }
-  });
-} else {
-  // Fallback in case errors are not structured
-  document.getElementById('currPasswordError').innerText = result.error || 'An error occurred. Please try again.';
-}
-} else {
-// On success, show a Swal alert with an OK button; then redirect to the user profile.
-Swal.fire({
-  icon: 'success',
-  title: 'Password Changed',
-  text: result.message || 'Your password has been changed successfully.',
-  confirmButtonText: 'OK'
-}).then((swalResult) => {
-  if (swalResult.isConfirmed) {
-    window.location.href = '/user/account/<%= user._id %>?tab=profile';
+  
+  console.log("DOMContentLoaded listener removed for testing");
+  const changePasswordForm = document.getElementById('changePasswordForm');
+  if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Clear previous error messages
+      document.getElementById('currPasswordError').innerText = '';
+      document.getElementById('newPasswordError').innerText = '';
+      document.getElementById('confirmPasswordError').innerText = '';
+      
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const payload = { currentPassword, newPassword, confirmPassword };
+      
+      try {
+        const response = await fetch(`/user/account/change-password/<%= user._id %>`, {
+          method: "PATCH",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          if (result.errors && Array.isArray(result.errors)) {
+            result.errors.forEach(error => {
+              if (error.param === 'currentPassword') {
+                document.getElementById('currPasswordError').innerText = error.msg;
+              }
+              if (error.param === 'newPassword') {
+                document.getElementById('newPasswordError').innerText = error.msg;
+              }
+              if (error.param === 'confirmPassword') {
+                document.getElementById('confirmPasswordError').innerText = error.msg;
+              }
+            });
+          } else {
+            document.getElementById('currPasswordError').innerText = result.error || 'An error occurred. Please try again.';
+          }
+        } else {
+          Swal.fire({
+            icon: 'success',
+            title: 'Password Changed',
+            text: result.message || 'Your password has been changed successfully.',
+            confirmButtonText: 'OK'
+          }).then((swalResult) => {
+            if (swalResult.isConfirmed) {
+              window.location.href = `/user/account/<%= user._id %>?tab=profile`;
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Something went wrong. Please try again later.',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  } else {
+    console.error('Change Password Form not found.');
   }
-});
-}
-} catch (error) {
-console.error('Fetch error:', error);
-Swal.fire({
-icon: 'error',
-title: 'Error',
-text: 'Something went wrong. Please try again later.',
-confirmButtonText: 'OK'
-});
-}
 
-})
-    }
+
     
     
   

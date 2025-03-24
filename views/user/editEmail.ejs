@@ -170,7 +170,7 @@
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: result.error || 'There was an error sending the OTP. Please try again later.',
+          text: result.error || result.message || 'There was an error sending the OTP. Please try again later.',
           confirmButtonText: 'Try again'
         });
       }

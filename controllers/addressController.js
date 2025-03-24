@@ -34,6 +34,9 @@ const verifyAddress=async(req,res)=>{
            
         }
         const newAddress = await Address.create(req.body)
+
+     
+        
         await User.findByIdAndUpdate(req.params.id,{$push : {addresses:newAddress._id }})
 
         res.status(200).json({

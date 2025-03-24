@@ -11,6 +11,10 @@ const addressController=require('../controllers/addressController')
 const{  validateAddress }= require('../middlewares/validateAddress')
 const {validateInfo} = require('../middlewares/validateInfo')
 const {validateEmail}= require('../middlewares/validateEmail')
+const cartController=require('../controllers/cartController')
+const wishlistController = require('../controllers/wishlistController')
+const checkoutController=require('../controllers/checkoutController')
+const orderController =require('../controllers/orderController')
 
 
 
@@ -66,6 +70,7 @@ user_route.patch('/account/edit-email/verify-otp/:id',userAuth.checkUserStatus,u
 // change password
 
 user_route.patch('/account/change-password/:id',userAuth.checkUserStatus,userProfileController.changePassword)
+
 //address
 
 user_route.get('/address/new/:id',userAuth.checkUserStatus,addressController.loadAddAddress)
@@ -76,5 +81,32 @@ user_route.put('/address/:id/edit',userAuth.checkUserStatus,upload.none(),valida
 user_route.post('/address/:id/delete',userAuth.checkUserStatus,addressController.deleteAddress)
 
 
+//cart management
 
-module.exports = user_route;
+user_route.get('/cart',userAuth.checkUserStatus,cartController.loadCart)
+user_route.post('/cart/add',userAuth.checkUserStatus,cartController.addToCart)
+user_route.post('/cart/remove/:id',userAuth.checkUserStatus,cartController.removeCart)
+user_route.post('/cart/update-quantity',userAuth.checkUserStatus,cartController.updateQuantity)
+
+
+//wishlist management
+
+user_route.get('/wishlist',userAuth.checkUserStatus,wishlistController.loadWishlist)
+user_route.post('/wishlist/add',userAuth.checkUserStatus,wishlistController.addToWishlist)
+user_route.post('/wishlist/delete/:id',userAuth.checkUserStatus,wishlistController.deleteWishlist)
+
+//checkout
+
+user_route.get('/checkout',userAuth.checkUserStatus,checkoutController.loadCheckOut)
+user_route.post('/order',userAuth.checkUserStatus,checkoutController.placeOrder)
+user_route.get('/order/confirmation/:id',userAuth.checkUserStatus,checkoutController.loadConfirmation)
+
+//order
+
+user_route.get('/order/detail/:id',userAuth.checkUserStatus,orderController.loadOrderDetail)
+user_route.get('/order/invoice/:id',userAuth.checkUserStatus,orderController.generateInvoice)
+user_route.put('/order/cancel/:id',userAuth.checkUserStatus,orderController.cancelOrder)
+user_route.put('/order/return/:id',userAuth.checkUserStatus,orderController.returnRequest)
+
+
+module.exports = user_route

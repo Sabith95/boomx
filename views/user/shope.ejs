@@ -89,7 +89,8 @@
                 <a href="/user/view-product/<%= product.id %>">
                     <div class="relative h-56 flex items-center justify-center bg-gray-50 p-4">
                         <img src="<%= product.image[0] %>" alt="<%= product.name %>" class="max-h-full object-contain">
-                        <button class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-600 hover:text-red-500">
+                        <button class="wishlist-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-600 hover:text-red-500"
+                        data-product-id="<%=product.id %>">
                             <i class="fas fa-heart"></i>
                         </button>
                     </div>
@@ -161,7 +162,7 @@
     </main>
 
 
-
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
    <!-- JavaScript for interactions -->
 <script>
   // Filter dropdown toggle
@@ -218,7 +219,58 @@
         document.getElementById('searchForm').submit()
       })
 
+//wishlist
 
+document.querySelectorAll('.wishlist-btn').forEach(function(button){
+  button.addEventListener('click',function(event){
+    event.preventDefault()
+    event.stopPropagation()
+
+    const productId=this.getAttribute('data-product-id')
+
+
+    fetch('/user/wishlist/add',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({productId:productId})
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        Toastify({
+          text: "Product added to wishlist successfully!",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+          close: true
+        }).showToast();
+      } else {
+        Toastify({
+          text: "Error: " + data.message,
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+          close: true
+        }).showToast();
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      Toastify({
+        text: "Error adding product to wishlist!",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        close: true
+      }).showToast();
+    });
+  })
+})
 
 </script>
 <%- include('../user/partials/foot') %>

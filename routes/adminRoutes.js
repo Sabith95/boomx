@@ -15,6 +15,7 @@ const brandController = require('../controllers/brandController')
 const productController =require('../controllers/productController')
 const adminUserController=require('../controllers/adminUserController')
 const adminAuth=require('../middlewares/adminAuth')
+const adminOrderController=require('../controllers/adminOrderController')
 
 
 
@@ -67,6 +68,13 @@ admin_route.post('/category',upload.single('image'),categoryController.verifyCat
 
 admin_route.get('/users',adminUserController.loadUser)
 admin_route.patch('/users/:id/changeStatus',adminUserController.updateStatus)
+
+// orders
+
+admin_route.get('/orders',adminOrderController.loadOrders)
+admin_route.post('/orders/updateOrderStatus/:id',adminOrderController.updateStatus)
+admin_route.get('/orders/orderDetails/:id',adminOrderController.loadOrderDetail)
+admin_route.post('/order/return/:id',adminOrderController.returnStatus)
 
 //logout
 
