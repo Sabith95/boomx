@@ -11,6 +11,18 @@ const userSchema = new mongoose.Schema({
         required:true,
         unique:true
     },
+    referralCode: { 
+        type: String, 
+        unique: true 
+    },
+    referredBy: {
+         type: mongoose.Schema.Types.ObjectId, 
+         ref: 'User' 
+        },
+        userId: { 
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
     mobile:
     {type:String,
         default: null

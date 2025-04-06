@@ -8,95 +8,451 @@
             <p class="mt-2 text-gray-600">Welcome to your admin dashboard</p>
         </div>
 
-        <!-- Stats Grid -->
-        <!-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"> -->
-            <!-- Total Orders Card -->
-            <!-- <div class="bg-white rounded-lg shadow p-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-gray-500 text-sm font-medium">Total Orders</h3>
-                    <i class="material-icons text-primary-500">shopping_cart</i>
+                    <div>
+                        <p class="text-gray-500">Total Sales</p>
+                        <h2 class="text-3xl font-bold">₹<%= totalSales && totalSales.length > 0 ? totalSales[0].total.toFixed(2) : '0.00' %></h2>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-dollar-sign text-blue-500"></i>
+                    </div>
                 </div>
-                <p class="text-2xl font-bold text-gray-900 mt-2">1,245</p>
-            </div> -->
-
-            <!-- Total Customers Card -->
-            <!-- <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-gray-500 text-sm font-medium">Total Customers</h3>
-                    <i class="material-icons text-primary-500">people</i>
-                </div>
-                <p class="text-2xl font-bold text-gray-900 mt-2">3,890</p>
-            </div> -->
-
-            <!-- Total Products Card -->
-            <!-- <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-gray-500 text-sm font-medium">Total Products</h3>
-                    <i class="material-icons text-primary-500">inventory_2</i>
-                </div>
-                <p class="text-2xl font-bold text-gray-900 mt-2">856</p>
-            </div> -->
-
-            <!-- Total Categories Card -->
-            <!-- <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-gray-500 text-sm font-medium">Total Categories</h3>
-                    <i class="material-icons text-primary-500">category</i>
-                </div>
-                <p class="text-2xl font-bold text-gray-900 mt-2">24</p>
+                <p class="text-green-500 text-sm mt-2">+<%= salesIncrease %>% increase</p>
             </div>
-        </div> -->
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500">Orders</p>
+                        <h2 class="text-3xl font-bold"><%= totalOrders %></h2>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-shopping-cart text-green-500"></i>
+                    </div>
+                </div>
+                <p class="text-green-500 text-sm mt-2">+<%= ordersIncrease %>% increase</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500">Customers</p>
+                        <h2 class="text-3xl font-bold"><%= totalCustomers %></h2>
+                    </div>
+                    <div class="bg-purple-100 p-3 rounded-full">
+                        <i class="fas fa-users text-purple-500"></i>
+                    </div>
+                </div>
+                <p class="text-green-500 text-sm mt-2">+<%= customersIncrease %>% increase</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500">Avg. Order Value</p>
+                        <h2 class="text-3xl font-bold">₹<%= avgOrderValue %></h2>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full">
+                        <i class="fas fa-chart-line text-yellow-500"></i>
+                    </div>
+                </div>
+                <p class="text-green-500 text-sm mt-2">+<%= aovIncrease %>% increase</p>
+            </div>
+        </div>
 
-        <!-- Recent Activity Section -->
-        <!-- <div class="mt-8">
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
-                    <div class="space-y-4"> -->
-                        <!-- Activity Items -->
-                        <!-- <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <i class="material-icons text-primary-500">shopping_bag</i>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-900">New order received</p>
-                                <p class="text-sm text-gray-500">Order #12345 - John Doe</p>
-                            </div>
-                            <div class="ml-auto">
-                                <span class="text-sm text-gray-500">5 min ago</span>
-                            </div>
-                        </div> -->
-
-                        <!-- <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <i class="material-icons text-primary-500">person_add</i>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-900">New customer registered</p>
-                                <p class="text-sm text-gray-500">Jane Smith</p>
-                            </div>
-                            <div class="ml-auto">
-                                <span class="text-sm text-gray-500">15 min ago</span>
-                            </div> -->
-                        <!-- </div>
-
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <i class="material-icons text-primary-500">inventory</i>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-900">Product stock updated</p>
-                                <p class="text-sm text-gray-500">Men's Classic T-Shirt</p>
-                            </div>
-                            <div class="ml-auto">
-                                <span class="text-sm text-gray-500">1 hour ago</span>
-                            </div>
+        <!-- Sales Chart with Filter -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-semibold text-gray-700">Sales Performance</h3>
+                    <div class="relative">
+                        <select id="time-filter" class="block appearance-none bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-primary-500">
+                            <option value="yearly">Yearly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="daily">Daily</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <i class="fas fa-chevron-down"></i>
                         </div>
                     </div>
                 </div>
+                <div class="relative h-80">
+                    <canvas id="sales-chart"></canvas>
+                </div>
             </div>
-        </div> -->
+        </div>
+
+        <!-- Top 10 Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Best Selling Products -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Best Selling Products (Top 10)</h3>
+                    <div class="relative h-80">
+                        <canvas id="products-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Selling Categories -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Best Selling Categories (Top 10)</h3>
+                    <div class="relative h-80">
+                        <canvas id="categories-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Selling Brands -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Best Selling Brands (Top 10)</h3>
+                    <div class="relative h-80">
+                        <canvas id="brands-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Products, Categories and Brands Tables -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Top Products Table -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 10 Products</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3">Product Name</th>
+                                    <th class="px-4 py-3">Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <% if (topProducts && topProducts.length > 0) { %>
+                                    <% topProducts.forEach(product => { %>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900"><%= product.name %></div>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <div class="text-sm text-gray-500">₹<%= product.totalSales.toFixed(2) %></div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="2" class="px-4 py-3 text-center text-sm text-gray-500">No data available</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Categories Table -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 10 Categories</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3">Category Name</th>
+                                    <th class="px-4 py-3">Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <% if (topCategories && topCategories.length > 0) { %>
+                                    <% topCategories.forEach(category => { %>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900"><%= category.name %></div>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <div class="text-sm text-gray-500">₹<%= category.totalSales.toFixed(2) %></div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="2" class="px-4 py-3 text-center text-sm text-gray-500">No data available</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Brands Table -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 10 Brands</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3">Brand Name</th>
+                                    <th class="px-4 py-3">Sales</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <% if (topBrands && topBrands.length > 0) { %>
+                                    <% topBrands.forEach(brand => { %>
+                                        <tr>
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900"><%= brand.name %></div>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <div class="text-sm text-gray-500">₹<%= brand.totalSales.toFixed(2) %></div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="2" class="px-4 py-3 text-center text-sm text-gray-500">No data available</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </main>
+
+<!-- Make sure these are included in your header or footer partial -->
+<!-- If not already included, add these script tags before the closing body tag -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+
+
+    
+    // Process data from the server for charts
+    const yearlyData = {
+        labels: <%- JSON.stringify(salesByYear.map(item => item._id)) %>,
+        datasets: [{
+            label: 'Sales',
+            data: <%- JSON.stringify(salesByYear.map(item => item.totalSales)) %>,
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 2
+        }]
+    };
+
+    // Process monthly data
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthlySales = Array(12).fill(0);
+    
+    <% if (salesByMonth && salesByMonth.length > 0) { %>
+        <% salesByMonth.forEach(item => { %>
+            monthlySales[<%= item._id - 1 %>] = <%= item.totalSales %>;
+        <% }); %>
+    <% } %>
+    
+    const monthlyData = {
+        labels: months,
+        datasets: [{
+            label: 'Sales',
+            data: monthlySales,
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 2
+        }]
+    };
+
+    // Process weekly data
+    const weeklyData = {
+        labels: <%- JSON.stringify(salesByWeek.map((item, index) => 'Week ' + (index + 1))) %>,
+        datasets: [{
+            label: 'Sales',
+            data: <%- JSON.stringify(salesByWeek.map(item => item.totalSales)) %>,
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 2
+        }]
+    };
+
+    // Process daily data
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dailySalesData = Array(7).fill(0);
+    
+    <% if (salesByDay && salesByDay.length > 0) { %>
+        <% salesByDay.forEach(item => { %>
+            // Day of week in MongoDB is 1 (Sunday) to 7 (Saturday)
+            dailySalesData[<%= item._id - 1 %>] = <%= item.totalSales %>;
+        <% }); %>
+    <% } %>
+    
+    const dailyData = {
+        labels: days,
+        datasets: [{
+            label: 'Sales',
+            data: dailySalesData,
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 2
+        }]
+    };
+
+    // Process top products data
+    const productsData = {
+        labels: <%- JSON.stringify(topProducts.map(item => item.name)) %>,
+        datasets: [{
+            label: 'Sales',
+            data: <%- JSON.stringify(topProducts.map(item => item.totalSales)) %>,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(199, 199, 199, 0.7)',
+                'rgba(83, 102, 255, 0.7)',
+                'rgba(40, 159, 64, 0.7)',
+                'rgba(210, 199, 199, 0.7)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    // Process top categories data
+    const categoriesData = {
+        labels: <%- JSON.stringify(topCategories.map(item => item.name)) %>,
+        datasets: [{
+            label: 'Sales',
+            data: <%- JSON.stringify(topCategories.map(item => item.totalSales)) %>,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(199, 199, 199, 0.7)',
+                'rgba(83, 102, 255, 0.7)',
+                'rgba(40, 159, 64, 0.7)',
+                'rgba(210, 199, 199, 0.7)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    // Process top brands data
+    const brandsData = {
+        labels: <%- JSON.stringify(topBrands.map(item => item.name)) %>,
+        datasets: [{
+            label: 'Sales',
+            data: <%- JSON.stringify(topBrands.map(item => item.totalSales)) %>,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(199, 199, 199, 0.7)',
+                'rgba(83, 102, 255, 0.7)',
+                'rgba(40, 159, 64, 0.7)',
+                'rgba(210, 199, 199, 0.7)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    // Initialize charts
+    document.addEventListener('DOMContentLoaded', function() {
+        const salesChartCtx = document.getElementById('sales-chart').getContext('2d');
+        let salesChart = new Chart(salesChartCtx, {
+            type: 'line',
+            data: yearlyData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const productsChartCtx = document.getElementById('products-chart').getContext('2d');
+        const productsChart = new Chart(productsChartCtx, {
+            type: 'bar',
+            data: productsData,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        const categoriesChartCtx = document.getElementById('categories-chart').getContext('2d');
+        const categoriesChart = new Chart(categoriesChartCtx, {
+            type: 'bar',
+            data: categoriesData,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        const brandsChartCtx = document.getElementById('brands-chart').getContext('2d');
+        const brandsChart = new Chart(brandsChartCtx, {
+            type: 'bar',
+            data: brandsData,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Handle time filter change
+        document.getElementById('time-filter').addEventListener('change', function() {
+            const filterValue = this.value;
+            let newData;
+            
+            if (filterValue === 'yearly') {
+                newData = yearlyData;
+            } else if (filterValue === 'monthly') {
+                newData = monthlyData;
+            } else if (filterValue === 'weekly') {
+                newData = weeklyData;
+            } else if (filterValue === 'daily') {
+                newData = dailyData;
+            }
+            
+            salesChart.data = newData;
+            salesChart.update();
+        });
+    });
+</script>
 
 <%- include("../admin/partials/footer") -%>

@@ -23,18 +23,17 @@ const loadAddAddress = async(req,res)=>{
 const verifyAddress=async(req,res)=>{
     try {
         
-        const error = validationResult(req)
-        if(!error.isEmpty()){
-            const errorMessages = error.array().map(error => error.msg)
-            return res.status(400).json({
-                success:false,
-                error:errorMessages
-            })
 
-           
-        }
+        const error = validationResult(req);
+                    if (!error.isEmpty()) {
+                        return res.status(400).json({
+                        success: false,
+                        error: error.array() 
+                        });
+                    }
+                    
         const newAddress = await Address.create(req.body)
-
+        console.log(req.body)
      
         
         await User.findByIdAndUpdate(req.params.id,{$push : {addresses:newAddress._id }})
@@ -104,13 +103,12 @@ const loadEditAddress = async(req,res)=>{
 const editAddress =async(req,res)=>{
     try {
 
-        const error=validationResult(req)
-        if(!error.isEmpty()){
-            const errorMessages=error.array().map(error => error.msg)
+        const error = validationResult(req);
+        if (!error.isEmpty()) {
             return res.status(400).json({
-                success:false,
-                error:errorMessages
-            })
+            success: false,
+            error: error.array() 
+            });
         }
 
         const id = req.params.id

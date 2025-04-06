@@ -39,7 +39,7 @@
           </div>
           
           <div class="p-6">
-            <form action="/user/address/<%= address.id %>/edit" method="post" class="space-y-6" id="addressForm">
+            <form action="/user/address/<%= address.id %>/edit" method="post" class="space-y-6" id="addressForm" novalidate>
               <!-- Address Type & Name -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -67,6 +67,7 @@
                     placeholder="Enter full name"
                     required
                   >
+                  <div id="name-error" class="text-red-500 text-sm mt-1"></div>
                 </div>
               </div>
               
@@ -82,6 +83,8 @@
                   placeholder="Enter phone number"
                   required
                 >
+                <div id="phone-error" class="text-red-500 text-sm mt-1"></div>
+
               </div>
               
               <!-- Street Address -->
@@ -95,6 +98,8 @@
                   placeholder="Enter your complete street address"
                   required
                 ><%= address.streetAddress %></textarea>
+                <div id="street-error" class="text-red-500 text-sm mt-1"></div>
+
               </div>
               
               <!-- City, State, Zip -->
@@ -110,6 +115,8 @@
                     placeholder="Enter city"
                     required
                   >
+                  <div id="city-error" class="text-red-500 text-sm mt-1"></div>
+
                 </div>
                 
                 <div>
@@ -123,6 +130,8 @@
                     placeholder="Enter state"
                     required
                   >
+                  <div id="state-error" class="text-red-500 text-sm mt-1"></div>
+
                 </div>
                 
                 <div>
@@ -136,6 +145,8 @@
                     placeholder="Enter pin/zip code"
                     required
                   >
+                  <div id="pincode-error" class="text-red-500 text-sm mt-1"></div>
+
                 </div>
               </div>
               
@@ -151,6 +162,8 @@
                   placeholder="Enter country"
                   required
                 >
+                <div id="country-error" class="text-red-500 text-sm mt-1"></div>
+
               </div>
               
               <!-- Action Buttons -->
@@ -182,12 +195,54 @@
     addressForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       
+      
+      const errorFields = ['name-error','phone-error','street-error','city-error','state-error','pincode-error','country-error']
+        errorFields.forEach(fieldId => {
+        console.log(errorFields);
+        
+        const element = document.getElementById(fieldId);
+          if (element) {
+           element.textContent = '';
+             }
+            });
+
       try {
         const formData = new FormData(addressForm);
         const response = await fetch(addressForm.action, {
           method: 'PUT', // Using uppercase is a good practice
           body: formData
         });
+
+        if(!response.ok){
+            const errorData = await response.json()
+            if(errorData.error){
+              errorData.error.forEach(err =>{
+                if(err.path === 'name'){
+                document.getElementById('name-error').textContent = err.msg
+                }
+                else if(err.path === 'phone'){
+                document.getElementById('phone-error').textContent = err.msg;
+                }
+                else if(err.path === 'streetAddress'){
+                document.getElementById('street-error').textContent = err.msg
+                }
+                else if(err.path === 'city'){
+                document.getElementById('city-error').textContent = err.msg
+                }
+                else if(err.path === 'state'){
+                document.getElementById('state-error').textContent = err.msg
+                }
+                else if(err.path === 'pinCode'){
+                document.getElementById('pincode-error').textContent = err.msg
+                }
+                else if(err.path === 'country'){
+                document.getElementById('country-error').textContent = err.msg
+                }
+              })
+              return
+            }
+            throw new Error(errorData.message || 'Server Error')
+          }
         
         const data = await response.json();
         

@@ -6,6 +6,9 @@ const jwtHelper = require('../utils/jwtHelper');
 const category=require('../models/categoryModel')
 const product = require('../models/productModel');
 const { search } = require('../routes/adminRoutes');
+const referralHelper =require('../utils/referralHelper')
+const generateCouponCode = require('../utils/generateCouponCode');
+const Coupon = require('../models/couponModel')
 
 const loadSignUp = async (req, res) => {
   try {
@@ -49,6 +52,7 @@ const verifyOtp = async (req, res) => {
     }
     const hashPassword = await bcrypt.hash(decoded.password, 10);
    
+    const newReferralCode = await referralHelper(User)
     
     // creating new user
     const newUser = new User({
@@ -57,6 +61,7 @@ const verifyOtp = async (req, res) => {
       mobile: decoded.mobile,
       password: hashPassword,
       image:decoded.imagePath,
+      referralCode:newReferralCode
     });
    
     
@@ -226,6 +231,83 @@ const loadResetPasswordPage = (req, res) => {
   res.render('user/reset-password');
 };
 
+const applyReferral =async(req,res)=>{
+  try {
+    const {referralInput} = req.body
+    if(!referralInput || referralInput.trim() === 0){
+      return res.status(400).json({ success: false, message: "Referral code is required" });
+    }
+    
+    const referringUser = await User.findOne({referralCode:referralInput.trim().toUpperCase()})
+    if (!referringUser) {
+      return res.status(400).json({ success: false, message: "Invalid referral code" });
+    }
+
+    const userId = req.user._id
+    const currentUser = await User.findById(userId)
+    if (!currentUser) {
+      return res.status(400).json({ success: false, message: "User not found" });
+    }
+
+    if(referralInput.trim().toUpperCase() === currentUser.referralCode){
+      return res.status(400).json({ success: false, message: "You cannot use your own referral code" });
+    }
+
+    if (currentUser.referredBy) {
+      return res.status(400).json({ success: false, message: "Referral code already applied" });
+    }
+
+    currentUser.referredBy = referringUser
+    await currentUser.save()
+
+    const couponDiscountValue = 10; 
+    const couponMinimumPurchase = 0;
+    const couponDescription = "Referral reward coupon";
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+    const couponForReferrer = new Coupon({
+      code: generateCouponCode(), 
+      discountValue: couponDiscountValue,
+      minimumPurchase: couponMinimumPurchase,
+      description: couponDescription,
+      expiryDate,
+      usageLimit: 1,
+      isActive: true,
+      couponType:'referral',
+      userId: referringUser._id
+    })
+
+    await couponForReferrer.save()
+
+    const couponForAppliedUser = new Coupon({
+      code: generateCouponCode(),
+      discountValue: couponDiscountValue,
+      minimumPurchase: couponMinimumPurchase,
+      description: couponDescription,
+      expiryDate,
+      usageLimit: 1,
+      isActive: true,
+      couponType:'referral',
+      userId:currentUser._id
+    });
+
+    await couponForAppliedUser.save();
+
+    return res.status(200).json({ 
+      success: true, 
+      message: "Referral code applied successfully. Coupons have been issued for both you and your referrer."
+    });
+
+
+  } catch (error) {
+    
+    console.error("Error applying referral code:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+
+  }
+}
+
 module.exports = {
   loadSignUp,
   sendOtp,
@@ -238,5 +320,6 @@ module.exports = {
   resetPassword,
   loadOtpPage,
   loadResetPasswordPage,
-  logoutUser
+  logoutUser,
+  applyReferral
 };

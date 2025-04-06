@@ -97,7 +97,7 @@
                     <div class="p-5">
                         <div class="text-sm text-gray-500 mb-1"><%= product.brand.name %></div>
                         <h3 class="font-semibold text-xl mb-2"><%= product.name %></h3>
-                        <div class="flex items-center mb-3">
+                        <!-- <div class="flex items-center mb-3">
                             <div class="flex text-yellow-400">
                                 <% for(let i = 1; i <= 5; i++) { %>
                                     <% if(i <= Math.floor(product.rating)) { %>
@@ -110,7 +110,7 @@
                                 <% } %>
                             </div>
                             <span class="text-gray-600 text-sm ml-2">(<%= product.rating %>)</span>
-                        </div>
+                        </div> -->
                         <div class="flex justify-between items-center">
                             <span class="font-bold text-2xl">₹<%= product.salePrice %></span>
                             <button id="addToCartBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full text-sm"  >

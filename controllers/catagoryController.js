@@ -1,6 +1,7 @@
+const { path } = require('pdfkit');
 const category = require('../models/categoryModel');
-// const { search } = require('../routes/adminRoutes');
 const jwtHelper = require('../utils/jwtHelper');
+const {validationResult} = require('express-validator')
 
 
 const loadCategories = async (req, res) => {
@@ -43,10 +44,21 @@ const verifyCategory = async (req, res) => {
           return res.status(401).json({ success: false, message: "Unauthorized access" });
       }
 
+      const error = validationResult(req);
+            if (!error.isEmpty()) {
+                return res.status(400).json({
+                success: false,
+                error: error.array() 
+                });
+            }
+
         const { name, description } = req.body;
         const existingCategory= await category.findOne({name})
         if(existingCategory){
-           return  res.status(400).json({message:"Category already registered"})
+           return  res.status(400).json({
+            success:false,
+            error:[{path:'name',msg:'Category already registered'}]
+           })
         }
         let imagePath =''
         if(req.file){
@@ -119,6 +131,14 @@ const editCategory = async (req, res) => {
   if (!token || !jwtHelper.verifyToken(token)) {
       return res.status(401).json({ success: false, message: "Unauthorized access" });
   }
+
+  const error = validationResult(req);
+            if (!error.isEmpty()) {
+                return res.status(400).json({
+                success: false,
+                error: error.array() 
+                });
+            }
   
     const { id } = req.params;
     const { name, description } = req.body;
@@ -135,7 +155,9 @@ const editCategory = async (req, res) => {
         _id: { $ne: id } 
       });
       if (duplicate) {
-        return res.status(400).json({ success: false, message: 'A category with that name already exists' });
+        return res.status(400).json({ success: false,
+          error:[{path:'name',msg:'Category already registered'}]
+         });
       }
       
       const updateData ={

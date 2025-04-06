@@ -1,5 +1,6 @@
 const brand = require('../models/brandModel')
 const jwtHelper = require('../utils/jwtHelper');
+const {validationResult} = require('express-validator')
 
 const loadBrands = async(req,res)=>{
     try {
@@ -34,11 +35,25 @@ const loadBrands = async(req,res)=>{
 
 const verifyBrand = async(req,res)=>{
     try {
+
+         const error = validationResult(req);
+                    if (!error.isEmpty()) {
+                        return res.status(400).json({
+                        success: false,
+                        error: error.array() 
+                        });
+                    }
+
         const {name,description} = req.body
         const existingBrand = await brand.findOne({name})
         if(existingBrand){
-           return res.status(400).json({message:"Brand already registered"})
+           return res.status(400).json({
+            success:false,
+            error:[{path:'name',msg:"Brand already registered"}]
+        })
         }
+
+
 
         let imagePath = ''
         if(req.file){
@@ -107,6 +122,14 @@ const loadEdit = async(req,res)=>{
 const editBrand  = async (req,res)=>{
     try {
 
+        const error = validationResult(req);
+        if (!error.isEmpty()) {
+            return res.status(400).json({
+            success: false,
+            error: error.array() 
+            });
+        }
+        
         const {id} = req.params
         const {name,description} = req.body
 
@@ -117,8 +140,13 @@ const editBrand  = async (req,res)=>{
             name:name.trim(),
             _id:{$ne:id}
         })
+
+        console.log('duplicate',duplicate);
+        
         if(duplicate){
-            res.status(400).json({success:false,message:"A brand with that name already exist"})
+          return  res.status(400).json({success:false,
+            error:[{path:'name',msg:"Brand already registered"}]
+          })
         }
         const updateData={
             name:name.trim(),
@@ -133,7 +161,7 @@ const editBrand  = async (req,res)=>{
             {new:true}
         )
         if(!updatedBrand){
-            res.status(400).json({success:false,message:"Brand not found"})
+           return res.status(400).json({success:false,message:"Brand not found"})
         }
         return res.status(200).json({success:true,message:"Brand updated",brand:updatedBrand})
     } catch (error) {

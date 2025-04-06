@@ -1,0 +1,246 @@
+<%- include("../admin/partials/header") -%>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto p-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Wallet Management</h1>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-lg shadow p-5">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 mr-4">
+                        <i class="fas fa-user-shield text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Admin Balance</p>
+                        <h3 id="adminBalance" class="text-2xl font-bold text-gray-800">₹<%= adminBalance.toFixed(2) %></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-5">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 mr-4">
+                        <i class="fas fa-wallet text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Credits</p>
+                        <h3 id="totalDeposits" class="text-2xl font-bold text-gray-800">₹<%= totalDeposits.toFixed(2) %></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-5">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-red-100 mr-4">
+                        <i class="fas fa-hand-holding-usd text-red-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Debits</p>
+                        <h3 id="totalWithdrawals" class="text-2xl font-bold text-gray-800">₹<%= totalWithdrawals.toFixed(2) %></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-5">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 mr-4">
+                        <i class="fas fa-exchange-alt text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Transactions</p>
+                        <h3 id="totalTransactions" class="text-2xl font-bold text-gray-800"><%= totalItems %></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Transactions Table -->
+        <div class="bg-white rounded-lg shadow mb-6">
+            <div class="p-5 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-800">Transaction History</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sr No.</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Transaction ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Transaction Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsTableBody" class="bg-white divide-y divide-gray-200">
+                        <% transactions.forEach(function(txn, index){ %>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 text-sm text-gray-600"><%= ((currentPage - 1) * limit) + index + 1 %></td>
+                            <td class="px-6 py-4 text-sm font-medium text-blue-600">#<%= txn.transactionId %></td>
+                            <td class="px-6 py-4 text-sm text-gray-600"><%= txn.formattedDate %></td>
+                            <td class="px-6 py-4 text-sm text-gray-600"><%= txn.user.name %></td>
+                            <td class="px-6 py-4 text-sm">
+                                <% if(txn.displayType === 'Credit'){ %>
+                                  <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">Credit</span>
+                                <% } else { %>
+                                  <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full">Debit</span>
+                                <% } %>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-medium <%= txn.displayType === 'Credit' ? 'text-green-600' : 'text-red-600' %>">
+                                <%= txn.displayType === 'Credit' ? '+' : '-' %>₹<%= txn.amount.toFixed(2) %>
+                            </td>
+                            <td class="px-6 py-4 text-sm">
+                                <button 
+                                    class="view-details-btn text-blue-600 hover:text-blue-800" 
+                                    data-transaction-id="<%= txn._id %>"
+                                >
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-6 flex justify-center">
+            <nav class="flex space-x-2">
+                <% if(currentPage > 1){ %>
+                    <a href="/admin/wallet?page=<%= currentPage - 1 %>" class="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300">&laquo; Prev</a>
+                <% } else { %>
+                    <span class="px-4 py-2 text-gray-400 bg-gray-200 rounded cursor-not-allowed">&laquo; Prev</span>
+                <% } %>
+                
+                <% for(let i = 1; i <= totalPages; i++){ %>
+                    <% if(i === currentPage){ %>
+                        <span class="px-4 py-2 rounded bg-gray-700 text-white"><%= i %></span>
+                    <% } else { %>
+                        <a href="/admin/wallet?page=<%= i %>" class="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"><%= i %></a>
+                    <% } %>
+                <% } %>
+                
+                <% if(currentPage < totalPages){ %>
+                    <a href="/admin/wallet?page=<%= currentPage + 1 %>" class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">&raquo;</a>
+                <% } else { %>
+                    <span class="px-4 py-2 text-gray-400 bg-gray-200 rounded cursor-not-allowed">&raquo;</span>
+                <% } %>
+            </nav>
+        </div>
+    </div>
+
+   <!-- Transaction Details Modal -->
+<div id="transactionDetailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white w-full max-w-2xl mx-auto p-6 rounded shadow-lg overflow-y-auto max-h-[90vh] relative">
+        <!-- Close button -->
+        <button id="closeModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+
+        <!-- User Details Section -->
+        <div class="mb-4">
+            <h4 class="text-md font-medium text-gray-700 mb-2">User Details</h4>
+            <div class="bg-gray-50 p-3 rounded" id="userDetails">
+                <p><strong>Name:</strong> <span id="userName"></span></p>
+                <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            </div>
+        </div>
+
+        <!-- Transaction Details Section -->
+        <div class="mb-4">
+            <h4 class="text-md font-medium text-gray-700 mb-2">Transaction Information</h4>
+            <div class="bg-gray-50 p-3 rounded" id="transactionInfo">
+                <p><strong>Transaction ID:</strong> <span id="transactionId"></span></p>
+                <p><strong>Type:</strong> <span id="transactionType"></span></p>
+                <p><strong>Amount:</strong> ₹<span id="transactionAmount"></span></p>
+                <p><strong>Date:</strong> <span id="transactionDate"></span></p>
+            </div>
+        </div>
+
+        <!-- Source Details Section -->
+        <div class="mb-4" id="sourceDetailsSection">
+            <h4 class="text-md font-medium text-gray-700 mb-2">Source Details</h4>
+            <div class="bg-gray-50 p-3 rounded" id="sourceDetails">
+                <p><strong>Source:</strong> <span id="transactionSource"></span></p>
+                <p><strong>Order Number:</strong> <span id="orderNumber"></span></p>
+            </div>
+        </div>
+
+        
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+       
+       document.addEventListener('DOMContentLoaded', function () {
+    const viewDetailsBtns = document.querySelectorAll('.view-details-btn');
+    const modal = document.getElementById('transactionDetailModal');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    // Open modal with transaction details
+    viewDetailsBtns.forEach(btn => {
+        btn.addEventListener('click', async function () {
+            const transactionId = this.getAttribute('data-transaction-id');
+
+            try {
+                const response = await fetch(`/admin/wallet/view/${transactionId}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const txn = data.transaction;
+
+                    // Fill user details
+                    document.getElementById('userName').textContent = txn.user.name;
+                    document.getElementById('userEmail').textContent = txn.user.email;
+
+                    // Fill transaction info
+                    document.getElementById('transactionId').textContent = txn.id;
+                    document.getElementById('transactionType').textContent = txn.transactionType;
+                    document.getElementById('transactionAmount').textContent = txn.amount;
+                    document.getElementById('transactionDate').textContent = new Date(txn.transactionDate).toLocaleString();
+
+                    // Fill source details
+                    document.getElementById('transactionSource').textContent = txn.source;
+                    document.getElementById('orderNumber').textContent = txn.orderNumber || 'N/A';
+
+
+                    // Show modal
+                    modal.classList.remove('hidden');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops!',
+                        text: 'Failed to load transaction details',
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error fetching transaction details:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong while fetching data.',
+                });
+            }
+        });
+    });
+
+    // Close modal
+    closeModalBtn.addEventListener('click', function () {
+        modal.classList.add('hidden');
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+});
+
+
+    </script>
+<%- include("../admin/partials/footer") %>

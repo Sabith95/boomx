@@ -218,7 +218,7 @@
             title: 'Email Updated',
             text: 'Your email address has been updated successfully.'
           }).then(() => {
-            window.location.href = '/user/account/<%= user._id %>?tab=profile';
+            window.location.href = '/user/login'
           });
         } else {
           Swal.fire({

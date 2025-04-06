@@ -2,6 +2,7 @@ const product = require('../models/productModel')
 const brand = require('../models/brandModel')
 const category =require('../models/categoryModel')
 const jwtHelper = require('../utils/jwtHelper');
+const {validationResult} = require('express-validator')
 
 
 
@@ -65,6 +66,14 @@ const verifyAddProduct=async (req,res)=>{
         if (!token || !jwtHelper.verifyToken(token)) {
             return res.status(401).json({ success: false, message: "Unauthorized access" });
         }
+
+        const error = validationResult(req);
+            if (!error.isEmpty()) {
+                return res.status(400).json({
+                success: false,
+                error: error.array() 
+                });
+            }
 
         const {name,description,brand,category,salePrice,regularPrice,quantity} =req.body
         
@@ -161,14 +170,39 @@ const editProduct = async (req, res) => {
             return res.status(401).json({ success: false, message: "Unauthorized access" });
         }
 
+        const error = validationResult(req);
+            if (!error.isEmpty()) {
+                return res.status(400).json({
+                success: false,
+                error: error.array() 
+                });
+            }
+
         const { id } = req.params;
         
         const { name, description, brand, category, salePrice, regularPrice, quantity, existingImages } = req.body;
-        console.log("Request body:", req.body);
-        console.log("Files:", req.files); // Log files to see what's actually being received
+        
 
         if (!name || !description) {
             return res.status(400).json({ success: false, message: "Name and description are required" });
+        }
+
+        if(Number(regularPrice)<=0 || Number(salePrice)<=0){
+            return res.status(400).json({
+                success:false,
+                message:"Price must be greater than zero"
+            })
+        }
+
+        if(Number(regularPrice) < Number(salePrice)){
+            return res.status(400).json({
+                success:false,
+                message:"The sale price cannot be higher than the regular price."
+            })
+        }
+        
+        if(Number(quantity)<0){
+            return res.status(400).json({message:"Quantity cannot be set to a negative value."})
         }
 
         const duplicate = await product.findOne({

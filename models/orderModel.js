@@ -1,5 +1,6 @@
 const mongoose= require('mongoose')
 const Counter = require('../models/counterModel')
+const { strike } = require('pdfkit')
 
 const orderSchema=new mongoose.Schema({
     user:{
@@ -8,20 +9,43 @@ const orderSchema=new mongoose.Schema({
         required:true
     },
     address:{
-        type:Object,
-        required:true
+        name:{
+            type:String,
+            required:true
+        },
+        phone:{
+            type:String,
+            required:true
+        },
+        streetAddress:{
+            type:String,
+            required:true
+        },
+        city:{
+            type:String,
+            required:true
+        },
+        state:{
+            type:String,
+            required:true
+        },
+        pinCode:{
+            type:String,
+            required:true
+        },
+        country:{
+            type:String,
+            required:true
+        }
+
     },
-    userName: {
-        type: String,
-        required: true
-      },
     items:{
             type:Array,
             required:true
         },
         paymentMethod:{
             type:String,
-            enum:['cod'],
+            enum:['cod','razorpay'],
             required:true
         },
         subtotal:{
@@ -36,6 +60,15 @@ const orderSchema=new mongoose.Schema({
             type:Number,
             required:true
         },
+        discount: {                
+            type: Number,
+            default: 0
+        },
+        coupon: {                 
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Coupon',
+            default: null
+        },
         status:{
             type:String,
             default:'Pending'
@@ -45,6 +78,20 @@ const orderSchema=new mongoose.Schema({
             unique:true
             
         },
+        razorpayOrderId:{
+            type:String
+        },
+        razorpayPaymentId:{
+            type:String
+        },
+        razorpaySignature:{
+            type:String
+        },
+        paymentStatus: {
+            type: String,
+            enum: ['Pending', 'Paid', 'Failed'],
+            default: 'Pending'
+          },
         returnRequest: {
             requested: {
               type: Boolean,

@@ -13,6 +13,8 @@ const loadCart=async(req,res)=>{
            
         }
 
+        // await Cart.findOneAndUpdate({ user: req.user._id }, { coupon: null, discount: 0 });
+
         let cart= await Cart.findOne({user:req.user._id}).populate('items.product')
         if(!cart){
             cart= {items:[],total:0}
@@ -22,14 +24,23 @@ const loadCart=async(req,res)=>{
             return sum + (item.priceAddition * item.quantity)
         },0)
 
-        const recalculatedTotal=recalculatedSubtotal
+        let shipping = 0
+
+        if(recalculatedSubtotal > 20000){
+            shipping = 100
+        }else{
+            shipping = 0
+        }
+
+        const recalculatedTotal=recalculatedSubtotal - shipping
         
 
         res.render('user/cart',{search:querySearch,
             cartItems:cart.items,
             subtotal:recalculatedSubtotal,
             tax:0,
-            total:recalculatedTotal
+            total:recalculatedTotal,
+            shipping : shipping
         })
     } catch (error) {
         console.error(error);
@@ -111,19 +122,16 @@ const addToCart=async(req,res)=>{
                 subtotal:qty*products.salePrice
             })
            }
-
-           cart.total= cart.items.reduce((acc,item)=> acc + item.subtotal,0)
            await cart.save()
+
+           const total = cart.items.reduce((acc,item)=> acc + item.subtotal,0)
 
            await Wishlist.findOneAndUpdate(
             {user:req.user._id},
             {$pull:{products:productId}}
            )
 
-           res.json({success:true,cart})
-
-
-
+           return res.json({success:true,cart,total})
 
     } catch (error) {
         console.error(error);
@@ -145,12 +153,14 @@ const removeCart=async(req,res)=>{
             return res.status(400).json({success:false,message:"Cart item not found"})
         }
 
-        cart.calculateTotal();
         await cart.save();
+        const total = cart.items.reduce((acc,item) => acc + item.subtotal || 0,0)
+
 
         return res.status(200).json({
             success:true,
-            message:"Cart removed successfully"
+            message:"Cart removed successfully",
+            cart,total
         })
     } catch (error) {
         console.error("Error deleting cart item:", error);
@@ -194,10 +204,12 @@ const updateQuantity=async(req,res)=>{
 
         cartItem.subtotal = cartItem.priceAddition * newQuantity
 
-        cart.calculateTotal()
+        
         await cart.save()
 
-        return res.json({ success: true, message: "Cart updated successfully.", cart });
+        const total = cart.items.reduce((acc,item) => acc + (item.subtotal || 0),0)
+
+        return res.json({ success: true, message: "Cart updated successfully.", cart,total });
 
     } catch (error) {
         console.error("Error updating cart quantity:", error);

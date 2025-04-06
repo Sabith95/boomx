@@ -65,7 +65,7 @@
                         <%= products.category.name %>
                       </div>
                     <!-- Rating -->
-                    <div class="flex items-center">
+                    <!-- <div class="flex items-center">
                         <div class="flex text-yellow-400">
                             <% for(let i = 1; i <= 5; i++) { %>
                                 <% if(i <= Math.floor(products.rating)) { %>
@@ -77,7 +77,7 @@
                                 <% } %>
                             <% } %>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Price Section -->
@@ -151,6 +151,7 @@
                 
                     <!-- Buy Now Button -->
                     <button 
+                        id="checkout-all-btn"
                         class="flex-1 bg-black hover:bg-gray-900 text-white py-3 px-6 rounded-md font-medium flex items-center justify-center <%= products.quantity === 0 ? 'opacity-50 cursor-not-allowed' : '' %>"
                         <%= products.quantity === 0 ? 'disabled' : '' %>
                     >
@@ -158,7 +159,9 @@
                     </button>
                 
                     <!-- Wishlist Button -->
-                    <button class="w-14 h-14 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-100 text-gray-600 hover:text-red-500">
+                    <button class="wishlist-btn w-14 h-14 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-100 text-gray-600 hover:text-red-500"
+                    data-product-id="<%=products.id %>">
+
                         <i class="fas fa-heart text-xl"></i>
                     </button>
                 </div>
@@ -207,7 +210,7 @@
                         <h3 class="font-medium text-sm mb-1 line-clamp-2 h-10"><%= products.name %></h3>
                         
                         <!-- Rating -->
-                        <div class="flex items-center mb-2">
+                        <!-- <div class="flex items-center mb-2">
                             <div class="flex text-yellow-400 text-xs">
                                 <% for(let i = 1; i <= 5; i++) { %>
                                     <% if(i <= Math.floor(products.rating)) { %>
@@ -220,7 +223,7 @@
                                 <% } %>
                             </div>
                             <span class="text-xs text-gray-500 ml-1">(<%= products.numReviews %>)</span>
-                        </div>
+                        </div> -->
                         
                         <!-- Price -->
                         <div class="flex items-center mb-3">
@@ -243,7 +246,8 @@
 </div>
 </main>
 
-<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
 <!-- JavaScript -->
 <script>
@@ -369,7 +373,7 @@ document.querySelectorAll('.addToCartBtn').forEach(function(button) {
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        swal({
+        Swal.fire({
           title: "Success!",
           text: "Product added to cart successfully!",
           icon: "success",
@@ -378,15 +382,82 @@ document.querySelectorAll('.addToCartBtn').forEach(function(button) {
           window.location.href = '/user/cart';
         });
       } else {
-        swal("Error",  data.message, "error");
+        Swal.fire("Error",  data.message, "error");
       }
     })
     .catch(error => {
       console.error('Error:', error);
-      swal("Error", "Error adding product.", "error");
+      Swal.fire("Error", "Error adding product.", "error");
     });
   });
 });
+
+//wishist
+
+document.querySelectorAll('.wishlist-btn').forEach(function(button){
+  button.addEventListener('click',function(event){
+    event.preventDefault()
+    event.stopPropagation()
+
+    const productId=this.getAttribute('data-product-id')
+
+
+    fetch('/user/wishlist/add',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({productId:productId})
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        Toastify({
+          text: "Product added to wishlist successfully!",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+          close: true
+        }).showToast();
+      } else {
+        Toastify({
+          text: "Error: " + data.message,
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+          close: true
+        }).showToast();
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      Toastify({
+        text: "Error adding product to wishlist!",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
+        close: true
+      }).showToast();
+    });
+  })
+})
+
+//buy now
+
+// function proceedToCheckout() {
+//     Swal.fire({
+//       title: 'Proceeding to Checkout',
+//       text: 'Redirecting to payment page...',
+//       icon: 'info',
+//       showConfirmButton: false,
+//       timer: 1500
+//     }).then(() => {
+//       window.location.href = '/user/checkout';
+//     });
+//   }
 
 </script>
 

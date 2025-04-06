@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const jwtHelper = require('../utils/jwtHelper');
 const Order = require('../models/orderModel')
 const Wallet = require('../models/walletModel')
+const Coupon = require('../models/couponModel')
 
 
 const loadAccount =async(req,res)=>{
@@ -25,15 +26,14 @@ const loadAccount =async(req,res)=>{
                     filter.name ={$regex : new RegExp(querySearch,"i")}
                 }
 
-        const orders = await Order.find({user:id}).sort({createdAt: -1}).populate('items.product')
+        const orders = await Order.find({user:id,paymentStatus:{$ne:'Failed'}}).sort({createdAt: -1}).populate('items.product')
+       
+
         
         let wallet = await Wallet.findOne({user:id})
         if(!wallet){
             wallet = await new Wallet({ user:id, balance: 0 }).save();
         }
-
-
-        
 
         res.render('user/userProfile',{user,activeTab,search:querySearch,defaultAddress,orders,wallet})
     } catch (error) {
@@ -228,6 +228,8 @@ const verifyOtp=async(req,res)=>{
         if(!updateEmail){
             return res.status(400).json({success:false,message:"Email not found"})
         }
+
+        res.clearCookie('token')
 
         return res.status(200).json({
             success:true,

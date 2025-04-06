@@ -2,6 +2,7 @@ const { findOne } = require('../models/counterModel');
 const Order = require('../models/orderModel')
 const jwtHelper = require('../utils/jwtHelper');
 const Wallet = require('../models/walletModel')
+const AdminWallet = require('../models/adminWalletModel')
 
 const loadOrders = async(req,res)=>{
     try {
@@ -17,13 +18,6 @@ const loadOrders = async(req,res)=>{
         
         const filter= {}
 
-        if(search){
-            filter.$or=[
-                {orderNumber:{$regex : search, $options : 'i'}},
-                {userName:{$regex : search, $options : 'i'}}
-            ]
-        }
-
         if(status){
             filter.status = status
         }
@@ -38,6 +32,8 @@ const loadOrders = async(req,res)=>{
             }
 
         }
+
+        filter.paymentStatus = {$ne : 'Failed'}
 
         let sortOption ={}
         switch(sort){
@@ -56,14 +52,21 @@ const loadOrders = async(req,res)=>{
                 break
             
         }
-        const orders = await Order.find(filter).sort(sortOption).skip(skip).limit(limit).populate('user')
+        let orders = await Order.find(filter).sort(sortOption).skip(skip).limit(limit).populate('user')
+
+        if(search){
+            orders = orders.filter(order =>
+                order.orderNumber.toLowerCase().includes(search.toLowerCase()) || 
+                (order.user && order.user.name.toLowerCase().includes(search.toLowerCase()))
+            )
+        }
 
         const totalItems = await Order.countDocuments()
         const totalPages = await Math.ceil(totalItems / limit)
 
 
 
-        res.render('admin/orders',{orders,currentPage:page,totalPages})
+        res.render('admin/orders',{orders,currentPage:page,totalPages,paymentStatus:orders.paymentStatus})
 
         
               
@@ -74,16 +77,52 @@ const loadOrders = async(req,res)=>{
 
 const updateStatus=async(req,res)=>{
     try {
+
+        const allowedTransitions ={
+            Pending : ['Processing','Cancelled'],
+            Processing : ['Shipped','Cancelled'],
+            Shipped : ['Out_for_delivery','Cancelled'],
+            Out_for_delivery : ['Delivered'],
+            Delivered : ['Returned'],
+            Returned : [],
+            Cancelled:[]
+            
+        }
+
         const orderId= req.params.id
-        const {status} = req.body
+        const {status } = req.body
+        console.log(req.body);
+        
 
        const order = await Order.findOne({orderNumber:orderId})
        if(!order){
         return res.status(404).json({ success: false, error: "Order not found" });
        }
 
+       const currentStatus = order.status
+       if(!allowedTransitions[currentStatus].includes(status)){
+        return res.status(400).json({
+            success:false,
+            error:`Invalid transition from ${currentStatus} to ${status}`
+        })
+       }
+
        order.status = status;
        await order.save();
+
+       if(order.paymentMethod === 'cod' && order.status === 'Delivered'){
+        order.paymentStatus = 'Paid'
+        await order.save()
+        const adminWalletTxn = new AdminWallet({
+            user:order.user,
+            transactionType:'credit',
+            source:'COD ',
+            order:order._id,
+            admin:process.env.ADMIN_ID,
+            amount:order.total
+        })
+        await adminWalletTxn.save()
+       }
 
        return res.json({ success: true, message: "Order status updated successfully" });
 
@@ -108,7 +147,7 @@ const loadOrderDetail=async(req,res)=>{
             return res.status(400).send("Order not found")
          }
 
-         res.render('admin/orderDetail',{order:orders})
+         res.render('admin/orderDetail',{order:orders,paymentStatus:orders.paymentStatus})
 
     } catch (error) {
         console.log(error)
@@ -144,6 +183,17 @@ const returnStatus = async(req,res)=>{
 
             wallet.balance += order.returnRequest.refundAmount
             await wallet.save()
+
+            const adminWalletTxn =new AdminWallet({
+                user:order.user,
+                transactionType:'debit',
+                amount:order.returnRequest.refundAmount,
+                source:'Return product',
+                order:order._id,
+                admin:process.env.ADMIN_ID
+            })
+
+            await adminWalletTxn.save()
         }
      else if (returnAction === 'reject') {
         order.returnRequest.returnStatus = 'Rejected';

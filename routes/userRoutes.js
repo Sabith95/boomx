@@ -100,6 +100,14 @@ user_route.post('/wishlist/delete/:id',userAuth.checkUserStatus,wishlistControll
 user_route.get('/checkout',userAuth.checkUserStatus,checkoutController.loadCheckOut)
 user_route.post('/order',userAuth.checkUserStatus,checkoutController.placeOrder)
 user_route.get('/order/confirmation/:id',userAuth.checkUserStatus,checkoutController.loadConfirmation)
+user_route.post('/payment/verify',userAuth.checkUserStatus,checkoutController.verifyPayment)
+user_route.post('/order/retry/:id',userAuth.checkUserStatus,checkoutController.retryOrder)
+user_route.get('/order/failure/:id',userAuth.checkUserStatus,checkoutController.loadFailure)
+
+//coupon management
+
+user_route.post('/checkout/apply-coupon',userAuth.checkUserStatus,checkoutController.applyCoupon)
+user_route.post('/checkout/remove-coupon',userAuth.checkUserStatus,checkoutController.removeCoupon)
 
 //order
 
@@ -107,6 +115,10 @@ user_route.get('/order/detail/:id',userAuth.checkUserStatus,orderController.load
 user_route.get('/order/invoice/:id',userAuth.checkUserStatus,orderController.generateInvoice)
 user_route.put('/order/cancel/:id',userAuth.checkUserStatus,orderController.cancelOrder)
 user_route.put('/order/return/:id',userAuth.checkUserStatus,orderController.returnRequest)
+
+//referral
+
+user_route.post('/apply-referral',upload.none(),userAuth.checkUserStatus,userController.applyReferral)
 
 
 module.exports = user_route

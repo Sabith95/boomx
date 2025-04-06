@@ -39,7 +39,7 @@
               <div class="mt-4 flex items-center">
                 <span class="text-purple-600 font-bold">₹<%= item.salePrice.toFixed(2) %></span>
                 <% if (item.regularPrice) { %>
-                  <span class="ml-2 text-gray-400 line-through">$<%= item.regularPrice.toFixed(2) %></span>
+                  <span class="ml-2 text-gray-400 line-through">₹<%= item.regularPrice.toFixed(2) %></span>
                 <% } %>
                 <% if (item.quantity > 0) { %>
                   <span class="ml-4 text-amber-600 text-sm">Only <%= item.quantity %> left!</span>

@@ -130,6 +130,32 @@
                     <p class="text-gray-800"><%= defaultAddress.country %></p>
                   </div>
                 <% } %>
+
+                <!-- Referral Code Section -->
+    <div class="mt-8">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">Referral Code</h3>
+      <% if (user.referralCode) { %>
+        <p class="text-gray-800">Your Referral Code: <span class="font-bold text-blue-600"><%= user.referralCode %></span></p>
+        <% if (!user.referredBy) { %>
+          <form id="applyReferralForm" action="/user/apply-referral" method="POST" class="mt-4">
+            <label for="referralInput" class="block text-sm text-gray-500 mb-1">Enter Referral Code (if any)</label>
+            <input 
+              type="text" 
+              name="referralInput" 
+              id="referralInput" 
+              placeholder="Referral Code"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            >
+            <button type="submit" class="mt-2 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+              Apply Referral Code
+            </button>
+          </form>
+        <% } %>
+      <% } else { %>
+        <p class="text-gray-800">You do not have a referral code yet.</p>
+      <% } %>
+    </div>
+    
                 
                 <div class="mt-8">
                   <a href="/user/account/edit/<%= user._id %>" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md">
@@ -823,6 +849,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+//referral
+
+const referralForm = document.getElementById('applyReferralForm');
+  if (referralForm) {
+    referralForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(referralForm);
+      
+      try {
+        const res = await fetch('/user/apply-referral', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: result.message
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: result.message || 'Something went wrong'
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Server error. Please try again later.'
+        });
+      }
+    });
+  }
 
   </script>
 <%- include('../user/partials/foot') %>
