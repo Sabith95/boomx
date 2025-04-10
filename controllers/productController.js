@@ -84,6 +84,20 @@ const verifyAddProduct=async (req,res)=>{
             })
         }
 
+        if(!name || !name.trim()){
+            return res.status(400).json({
+                success:false,
+                message:'Name is required'
+            })
+        }
+
+        if(!description || !description.trim()){
+            return res.status(400).json({
+                success:false,
+                message:'Description is required'
+            })
+        }
+
         if(Number(regularPrice) < Number(salePrice)){
             return res.status(400).json({
                 success:false,

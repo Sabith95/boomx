@@ -14,8 +14,8 @@ const couponValidation =[
     body('discountValue')
     .notEmpty()
     .withMessage('Discount value is required')
-    .isFloat({min:0, max:100})
-    .withMessage('Discount value must be between 0 to 100'),
+    .isFloat({min:1, max:85})
+    .withMessage('Discount value must be between 1 to 85'),
 
     body('minimumPurchase')
     .notEmpty()

@@ -169,6 +169,7 @@ const generatePdf = async (req, res) => {
 
         if (cleanReportType || cleanStartDate || cleanEndDate) {
             if (cleanReportType) {
+                const now = new Date()
                 const referenceDate = cleanStartDate ? new Date(cleanStartDate) : now;
                 switch (cleanReportType) {
                     case 'daily': {

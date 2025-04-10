@@ -1,11 +1,11 @@
 const {check,validationResult} = require('express-validator')
 
 const productValidation =[
-    check('name').notEmpty().withMessage('Product name is required'),
+    check('name').trim().notEmpty().withMessage('Product name is required'),
 
     check('brand').notEmpty().withMessage('Brand is required'),
 
-    check('description').notEmpty().withMessage('Description is required'),
+    check('description').trim().notEmpty().withMessage('Description is required'),
 
     check('regularPrice')
         .notEmpty().withMessage('Regular price is required')

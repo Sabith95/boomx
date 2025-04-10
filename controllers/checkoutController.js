@@ -102,6 +102,17 @@ const placeOrder=async(req,res)=>{
             })
         }
 
+        for(let item of cartItems){
+            const productId = item.product._id ? item.product._id : item.product
+            const products = await product.findById(productId)
+            if(products.quantity <= 0){
+                return res.status(400).json({
+                    success:false,
+                    message:'Some items are out of stock'
+                })
+            }
+        }
+
         if(paymentMethod !== 'cod' && paymentMethod !== 'razorpay'){
             return res.status(400).json({
                 success:false,
@@ -147,12 +158,23 @@ const placeOrder=async(req,res)=>{
             const cart = await Cart.findOne({user:req.user._id})
             orderData.discount = cart ? (cart.discount || 0) : 0 
 
+            if(cart && cart.discount > 0){
+                const appliedCoupon = await Coupon.findOne({
+                    isActive:true
+                })
+                if(appliedCoupon){
+                    orderData.coupon = appliedCoupon._id
+                }
+            }
+
             if(total > 20000){
                 return res.status(400).json({
                     success:false,
                     message:'Cash on delivery is not available for orders above 20,000'
                 })
             }
+
+            
 
             const order = new Order(orderData)
             await order.save()
@@ -205,6 +227,15 @@ const placeOrder=async(req,res)=>{
             })
             const cart = await Cart.findOne({ user: req.user._id });
             order.discount = cart.discount ? (cart.discount || 0 ) : 0
+
+            if(cart && cart.discount > 0){
+                const appliedCoupon = await Coupon.findOne({
+                    isActive:true
+                })
+                if(appliedCoupon){
+                    order.coupon = appliedCoupon._id
+                }
+            }
 
             await order.save()
 
@@ -437,13 +468,6 @@ const loadConfirmation = async (req, res) => {
             })
         }
 
-        // if(coupons.timeUsed >=coupons.usageLimit){
-        //     return res.status(400).json({
-        //         success:false,
-        //         message:'Coupon usage limit reached'
-        //     })
-        // }
-
         const discount = (coupons.discountValue / 100) * originalTotal
 
         
@@ -451,7 +475,6 @@ const loadConfirmation = async (req, res) => {
         const total  = originalTotal - discount
         await cart.save()
 
-        // coupons.timeUsed++
         await coupons.save()
 
         return res.status(200).json({

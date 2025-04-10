@@ -25,8 +25,8 @@ const offerValidation = [
     body('discountPercentage')
     .notEmpty()
     .withMessage('Discount percentage is required')
-    .isFloat({ min: 1, max: 100 })
-    .withMessage('Discount percentage must be between 1 and 100'),
+    .isFloat({ min: 1, max: 85 })
+    .withMessage('Discount percentage must be between 1 and 85'),
 
     body('endDate')
     .notEmpty()

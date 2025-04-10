@@ -54,6 +54,20 @@ const verifyCoupon = async(req,res)=>{
             })
         }
 
+        if(discountValue > 85 || discountValue <=0){
+            return res.status(400).json({
+                success:false,
+                error:[{path:'discountValue',msg:'The discount value must range from 1 to 85. '}]
+            })
+        }
+
+        if(minimumPurchase <= 0){
+            return res.status(400).json({
+                success:false,
+                error:[{path:'minimumPurchase',msg:'The purchase amount must be a valid number.'}]
+            })
+        }
+
         const newCoupon = new Coupon({
             code,
             discountValue,
@@ -142,6 +156,13 @@ const verifyEdit= async(req,res)=>{
             error:[{path:'code',msg:'Coupon already registered'}]
            })
  
+        }
+
+        if(minimumPurchase <= 0){
+            return res.status(400).json({
+                success:false,
+                error:[{path:'minimumPurchase',msg:'The purchase amount must be a valid number.'}]
+            })
         }
 
         const updatedData = {

@@ -255,6 +255,12 @@ const returnRequest=async(req,res)=>{
         const orderId = req.params.id
         const {returnReason} = req.body
 
+        if(!returnReason || !returnReason.trim()){
+            return res.status(400).json({
+                success:false,error:'Return reason is required'
+            })
+        }
+
         const order = await Order.findOne({orderNumber:orderId})
         if (!order) {
             return res.status(404).json({ success: false, error: 'Order not found' });

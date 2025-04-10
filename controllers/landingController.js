@@ -14,6 +14,8 @@ try {
     if(querySearch){
         filter.name={$regex : new RegExp(querySearch,"i")}
     }
+
+    
     res.render('user/home',{products,categories,user:null,search:querySearch})
 } catch (error) {
     console.error(error)

@@ -53,7 +53,9 @@ const verifyCategory = async (req, res) => {
             }
 
         const { name, description } = req.body;
-        const existingCategory= await category.findOne({name})
+        const existingCategory= await category.findOne({
+          name:{$regex: new RegExp('^' + name + '$','i')}
+        })
         if(existingCategory){
            return  res.status(400).json({
             success:false,

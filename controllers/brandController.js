@@ -45,7 +45,9 @@ const verifyBrand = async(req,res)=>{
                     }
 
         const {name,description} = req.body
-        const existingBrand = await brand.findOne({name})
+        const existingBrand = await brand.findOne({
+            name:{$regex: new RegExp('^' + name + '$','i')}
+        })
         if(existingBrand){
            return res.status(400).json({
             success:false,

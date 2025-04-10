@@ -1,458 +1,601 @@
 <%- include("../admin/partials/header") -%>
 
 <main class="flex-1 overflow-y-auto bg-gray-50 p-4">
-    <div class="max-w-7xl mx-auto">
-        <!-- Dashboard Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-primary-900">Dashboard</h1>
-            <p class="mt-2 text-gray-600">Welcome to your admin dashboard</p>
-        </div>
+  <div class="max-w-7xl mx-auto">
+    <!-- Dashboard Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-primary-900">Dashboard</h1>
+      <p class="mt-2 text-gray-600">Welcome to your admin dashboard</p>
+    </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500">Total Sales</p>
-                        <h2 class="text-3xl font-bold">₹<%= totalSales && totalSales.length > 0 ? totalSales[0].total.toFixed(2) : '0.00' %></h2>
-                    </div>
-                    <div class="bg-blue-100 p-3 rounded-full">
-                        <i class="fas fa-dollar-sign text-blue-500"></i>
-                    </div>
+    <!-- Stats Cards (Added from older version) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500">Total Sales</p>
+                    <h2 class="text-3xl font-bold">₹<%= totalSales && totalSales.length > 0 ? totalSales[0].total.toFixed(2) : '0.00' %></h2>
                 </div>
-                <p class="text-green-500 text-sm mt-2">+<%= salesIncrease %>% increase</p>
-            </div>
-            
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500">Orders</p>
-                        <h2 class="text-3xl font-bold"><%= totalOrders %></h2>
-                    </div>
-                    <div class="bg-green-100 p-3 rounded-full">
-                        <i class="fas fa-shopping-cart text-green-500"></i>
-                    </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-dollar-sign text-blue-500"></i>
                 </div>
-                <p class="text-green-500 text-sm mt-2">+<%= ordersIncrease %>% increase</p>
             </div>
-            
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500">Customers</p>
-                        <h2 class="text-3xl font-bold"><%= totalCustomers %></h2>
-                    </div>
-                    <div class="bg-purple-100 p-3 rounded-full">
-                        <i class="fas fa-users text-purple-500"></i>
-                    </div>
-                </div>
-                <p class="text-green-500 text-sm mt-2">+<%= customersIncrease %>% increase</p>
-            </div>
-            
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500">Avg. Order Value</p>
-                        <h2 class="text-3xl font-bold">₹<%= avgOrderValue %></h2>
-                    </div>
-                    <div class="bg-yellow-100 p-3 rounded-full">
-                        <i class="fas fa-chart-line text-yellow-500"></i>
-                    </div>
-                </div>
-                <p class="text-green-500 text-sm mt-2">+<%= aovIncrease %>% increase</p>
-            </div>
+            <p class="text-green-500 text-sm mt-2">+<%= salesIncrease %>% increase</p>
         </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500">Orders</p>
+                    <h2 class="text-3xl font-bold"><%= totalOrders %></h2>
+                </div>
+                <div class="bg-green-100 p-3 rounded-full">
+                    <i class="fas fa-shopping-cart text-green-500"></i>
+                </div>
+            </div>
+            <p class="text-green-500 text-sm mt-2">+<%= ordersIncrease %>% increase</p>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500">Customers</p>
+                    <h2 class="text-3xl font-bold"><%= totalCustomers %></h2>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <i class="fas fa-users text-purple-500"></i>
+                </div>
+            </div>
+            <p class="text-green-500 text-sm mt-2">+<%= customersIncrease %>% increase</p>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500">Avg. Order Value</p>
+                    <h2 class="text-3xl font-bold">₹<%= avgOrderValue %></h2>
+                </div>
+                <div class="bg-yellow-100 p-3 rounded-full">
+                    <i class="fas fa-chart-line text-yellow-500"></i>
+                </div>
+            </div>
+            <p class="text-green-500 text-sm mt-2">+<%= aovIncrease %>% increase</p>
+        </div>
+    </div>
 
-        <!-- Sales Chart with Filter -->
-        <div class="bg-white rounded-lg shadow mb-8">
+    <!-- Filter Select (for charts) - Moved above charts for better UX -->
+    <div class="mb-6">
+      <div class="relative inline-block">
+        <select id="time-filter" class="block appearance-none bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-primary-500">
+          <option value="yearly">Yearly</option>
+          <option value="monthly">Monthly</option>
+          <option value="weekly">Weekly</option>
+          <option value="daily">Daily</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Sales Chart -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Sales Performance</h3>
+        <div class="relative h-80">
+          <canvas id="sales-chart"></canvas>
+        </div>
+      </div>
+      <!-- Top Products Chart -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Best Selling Products (Top 10)</h3>
+        <div class="relative h-80">
+          <canvas id="products-chart"></canvas>
+        </div>
+      </div>
+      <!-- Top Categories Chart -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Best Selling Categories (Top 10)</h3>
+        <div class="relative h-80">
+          <canvas id="categories-chart"></canvas>
+        </div>
+      </div>
+      <!-- Top Brands Chart -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Best Selling Brands (Top 10)</h3>
+        <div class="relative h-80">
+          <canvas id="brands-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Products, Categories and Brands Tables (Added from older version) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Top Products Table -->
+        <div class="bg-white rounded-lg shadow">
             <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-semibold text-gray-700">Sales Performance</h3>
-                    <div class="relative">
-                        <select id="time-filter" class="block appearance-none bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-primary-500">
-                            <option value="yearly">Yearly</option>
-                            <option value="monthly">Monthly</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="daily">Daily</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="relative h-80">
-                    <canvas id="sales-chart"></canvas>
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 10 Products</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-4 py-3">Product Name</th>
+                                <th class="px-4 py-3">Sales</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% if (topProductsYearly && topProductsYearly.length > 0) { %>
+                                <% topProductsYearly.forEach(product => { %>
+                                    <tr>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900"><%= product.name %></div>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <div class="text-sm text-gray-500">₹<%= product.totalSales.toFixed(2) %></div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="2" class="px-4 py-3 text-center text-sm text-gray-500">No data available</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- Top 10 Charts Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Best Selling Products -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Best Selling Products (Top 10)</h3>
-                    <div class="relative h-80">
-                        <canvas id="products-chart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Best Selling Categories -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Best Selling Categories (Top 10)</h3>
-                    <div class="relative h-80">
-                        <canvas id="categories-chart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Best Selling Brands -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Best Selling Brands (Top 10)</h3>
-                    <div class="relative h-80">
-                        <canvas id="brands-chart"></canvas>
-                    </div>
+        <!-- Top Categories Table -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 10 Categories</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-4 py-3">Category Name</th>
+                                <th class="px-4 py-3">Sales</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% if (topCategoriesYearly && topCategoriesYearly.length > 0) { %>
+                                <% topCategoriesYearly.forEach(category => { %>
+                                    <tr>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900"><%= category.name %></div>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <div class="text-sm text-gray-500">₹<%= category.totalSales.toFixed(2) %></div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="2" class="px-4 py-3 text-center text-sm text-gray-500">No data available</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- Top Products, Categories and Brands Tables -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Top Products Table -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 10 Products</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full">
-                            <thead>
-                                <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <th class="px-4 py-3">Product Name</th>
-                                    <th class="px-4 py-3">Sales</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <% if (topProducts && topProducts.length > 0) { %>
-                                    <% topProducts.forEach(product => { %>
-                                        <tr>
-                                            <td class="px-4 py-3 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900"><%= product.name %></div>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap">
-                                                <div class="text-sm text-gray-500">₹<%= product.totalSales.toFixed(2) %></div>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
-                                <% } else { %>
+        <!-- Top Brands Table -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 10 Brands</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-4 py-3">Brand Name</th>
+                                <th class="px-4 py-3">Sales</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% if (topBrandsYearly && topBrandsYearly.length > 0) { %>
+                                <% topBrandsYearly.forEach(brand => { %>
                                     <tr>
-                                        <td colspan="2" class="px-4 py-3 text-center text-sm text-gray-500">No data available</td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900"><%= brand.name %></div>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <div class="text-sm text-gray-500">₹<%= brand.totalSales.toFixed(2) %></div>
+                                        </td>
                                     </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Top Categories Table -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 10 Categories</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full">
-                            <thead>
-                                <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <th class="px-4 py-3">Category Name</th>
-                                    <th class="px-4 py-3">Sales</th>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="2" class="px-4 py-3 text-center text-sm text-gray-500">No data available</td>
                                 </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <% if (topCategories && topCategories.length > 0) { %>
-                                    <% topCategories.forEach(category => { %>
-                                        <tr>
-                                            <td class="px-4 py-3 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900"><%= category.name %></div>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap">
-                                                <div class="text-sm text-gray-500">₹<%= category.totalSales.toFixed(2) %></div>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="2" class="px-4 py-3 text-center text-sm text-gray-500">No data available</td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Top Brands Table -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 10 Brands</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full">
-                            <thead>
-                                <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <th class="px-4 py-3">Brand Name</th>
-                                    <th class="px-4 py-3">Sales</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <% if (topBrands && topBrands.length > 0) { %>
-                                    <% topBrands.forEach(brand => { %>
-                                        <tr>
-                                            <td class="px-4 py-3 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900"><%= brand.name %></div>
-                                            </td>
-                                            <td class="px-4 py-3 whitespace-nowrap">
-                                                <div class="text-sm text-gray-500">₹<%= brand.totalSales.toFixed(2) %></div>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="2" class="px-4 py-3 text-center text-sm text-gray-500">No data available</td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
+                            <% } %>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+  </div>
 </main>
 
-<!-- Make sure these are included in your header or footer partial -->
-<!-- If not already included, add these script tags before the closing body tag -->
+<!-- Chart.js Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script>
+  // Process sales chart data
+  const yearlyData = {
+      labels: <%- JSON.stringify(salesByYear.map(item => item._id)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(salesByYear.map(item => item.totalSales)) %>,
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 2
+      }]
+  };
 
+  // Process monthly data
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthlySales = Array(12).fill(0);
+  <% if (salesByMonth && salesByMonth.length > 0) { %>
+    <% salesByMonth.forEach(item => { %>
+        monthlySales[<%= item._id - 1 %>] = <%= item.totalSales %>;
+    <% }); %>
+  <% } %>
+  const monthlyData = {
+      labels: months,
+      datasets: [{
+          label: 'Sales',
+          data: monthlySales,
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 2
+      }]
+  };
 
-    
-    // Process data from the server for charts
-    const yearlyData = {
-        labels: <%- JSON.stringify(salesByYear.map(item => item._id)) %>,
-        datasets: [{
-            label: 'Sales',
-            data: <%- JSON.stringify(salesByYear.map(item => item.totalSales)) %>,
-            backgroundColor: 'rgba(59, 130, 246, 0.2)',
-            borderColor: 'rgba(59, 130, 246, 1)',
-            borderWidth: 2
-        }]
-    };
-
-    // Process monthly data
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthlySales = Array(12).fill(0);
-    
-    <% if (salesByMonth && salesByMonth.length > 0) { %>
-        <% salesByMonth.forEach(item => { %>
-            monthlySales[<%= item._id - 1 %>] = <%= item.totalSales %>;
-        <% }); %>
-    <% } %>
-    
-    const monthlyData = {
-        labels: months,
-        datasets: [{
-            label: 'Sales',
-            data: monthlySales,
-            backgroundColor: 'rgba(59, 130, 246, 0.2)',
-            borderColor: 'rgba(59, 130, 246, 1)',
-            borderWidth: 2
-        }]
-    };
-
-    // Process weekly data
-    const weeklyData = {
-        labels: <%- JSON.stringify(salesByWeek.map((item, index) => 'Week ' + (index + 1))) %>,
-        datasets: [{
-            label: 'Sales',
-            data: <%- JSON.stringify(salesByWeek.map(item => item.totalSales)) %>,
-            backgroundColor: 'rgba(59, 130, 246, 0.2)',
-            borderColor: 'rgba(59, 130, 246, 1)',
-            borderWidth: 2
-        }]
-    };
-
-    // Process daily data
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const dailySalesData = Array(7).fill(0);
-    
-    <% if (salesByDay && salesByDay.length > 0) { %>
-        <% salesByDay.forEach(item => { %>
-            // Day of week in MongoDB is 1 (Sunday) to 7 (Saturday)
-            dailySalesData[<%= item._id - 1 %>] = <%= item.totalSales %>;
-        <% }); %>
-    <% } %>
-    
-    const dailyData = {
-        labels: days,
-        datasets: [{
-            label: 'Sales',
-            data: dailySalesData,
-            backgroundColor: 'rgba(59, 130, 246, 0.2)',
-            borderColor: 'rgba(59, 130, 246, 1)',
-            borderWidth: 2
-        }]
-    };
-
-    // Process top products data
-    const productsData = {
-        labels: <%- JSON.stringify(topProducts.map(item => item.name)) %>,
-        datasets: [{
-            label: 'Sales',
-            data: <%- JSON.stringify(topProducts.map(item => item.totalSales)) %>,
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.7)',
-                'rgba(54, 162, 235, 0.7)',
-                'rgba(255, 206, 86, 0.7)',
-                'rgba(75, 192, 192, 0.7)',
-                'rgba(153, 102, 255, 0.7)',
-                'rgba(255, 159, 64, 0.7)',
-                'rgba(199, 199, 199, 0.7)',
-                'rgba(83, 102, 255, 0.7)',
-                'rgba(40, 159, 64, 0.7)',
-                'rgba(210, 199, 199, 0.7)'
-            ],
-            borderWidth: 1
-        }]
-    };
-
-    // Process top categories data
-    const categoriesData = {
-        labels: <%- JSON.stringify(topCategories.map(item => item.name)) %>,
-        datasets: [{
-            label: 'Sales',
-            data: <%- JSON.stringify(topCategories.map(item => item.totalSales)) %>,
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.7)',
-                'rgba(54, 162, 235, 0.7)',
-                'rgba(255, 206, 86, 0.7)',
-                'rgba(75, 192, 192, 0.7)',
-                'rgba(153, 102, 255, 0.7)',
-                'rgba(255, 159, 64, 0.7)',
-                'rgba(199, 199, 199, 0.7)',
-                'rgba(83, 102, 255, 0.7)',
-                'rgba(40, 159, 64, 0.7)',
-                'rgba(210, 199, 199, 0.7)'
-            ],
-            borderWidth: 1
-        }]
-    };
-
-    // Process top brands data
-    const brandsData = {
-        labels: <%- JSON.stringify(topBrands.map(item => item.name)) %>,
-        datasets: [{
-            label: 'Sales',
-            data: <%- JSON.stringify(topBrands.map(item => item.totalSales)) %>,
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.7)',
-                'rgba(54, 162, 235, 0.7)',
-                'rgba(255, 206, 86, 0.7)',
-                'rgba(75, 192, 192, 0.7)',
-                'rgba(153, 102, 255, 0.7)',
-                'rgba(255, 159, 64, 0.7)',
-                'rgba(199, 199, 199, 0.7)',
-                'rgba(83, 102, 255, 0.7)',
-                'rgba(40, 159, 64, 0.7)',
-                'rgba(210, 199, 199, 0.7)'
-            ],
-            borderWidth: 1
-        }]
-    };
-
-    // Initialize charts
-    document.addEventListener('DOMContentLoaded', function() {
-        const salesChartCtx = document.getElementById('sales-chart').getContext('2d');
-        let salesChart = new Chart(salesChartCtx, {
-            type: 'line',
-            data: yearlyData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        const productsChartCtx = document.getElementById('products-chart').getContext('2d');
-        const productsChart = new Chart(productsChartCtx, {
-            type: 'bar',
-            data: productsData,
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-
-        const categoriesChartCtx = document.getElementById('categories-chart').getContext('2d');
-        const categoriesChart = new Chart(categoriesChartCtx, {
-            type: 'bar',
-            data: categoriesData,
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-
-        const brandsChartCtx = document.getElementById('brands-chart').getContext('2d');
-        const brandsChart = new Chart(brandsChartCtx, {
-            type: 'bar',
-            data: brandsData,
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-
-        // Handle time filter change
-        document.getElementById('time-filter').addEventListener('change', function() {
-            const filterValue = this.value;
-            let newData;
+  const weeklyData = {
+    labels: <%- JSON.stringify(salesByWeek.map((item, index) => {
+        const startDate = new Date(item.minDate);
+        const endDate = new Date(item.maxDate);
+        
+        // Get the month name
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const month = months[startDate.getMonth()];
+        
+        // For April data, we need to ensure we don't duplicate week labels
+        // Use the actual date range for uniqueness
+        const startDay = startDate.getDate();
+        let endDay = endDate.getDate();
+        
+        // If this is the second week of April that would also be 1-7
+        // adjust to show the actual date range or the next standard week
+        if (month === "Apr" && startDay >= 1 && startDay <= 7 && index > 0) {
+            // Check if we've already had an "Apr 1-7" entry
+            const prevEntries = salesByWeek.slice(0, index);
+            const hasApril1to7 = prevEntries.some(entry => {
+                const entryDate = new Date(entry.minDate);
+                const entryMonth = months[entryDate.getMonth()];
+                const entryStartDay = entryDate.getDate();
+                return entryMonth === "Apr" && entryStartDay >= 1 && entryStartDay <= 7;
+            });
             
-            if (filterValue === 'yearly') {
-                newData = yearlyData;
-            } else if (filterValue === 'monthly') {
-                newData = monthlyData;
-            } else if (filterValue === 'weekly') {
-                newData = weeklyData;
-            } else if (filterValue === 'daily') {
-                newData = dailyData;
+            if (hasApril1to7) {
+                return `Apr 8-14`; // Use next week format
             }
-            
-            salesChart.data = newData;
-            salesChart.update();
-        });
-    });
+        }
+        
+        // Use standardized week format
+        if (startDay >= 1 && startDay <= 7) {
+            return `${month} 1-7`;
+        } else if (startDay >= 8 && startDay <= 14) {
+            return `${month} 8-14`;
+        } else if (startDay >= 15 && startDay <= 21) {
+            return `${month} 15-21`;
+        } else if (startDay >= 22 && startDay <= 28) {
+            return `${month} 22-28`;
+        } else {
+            // For dates after the 28th, show actual range
+            const lastDay = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+            endDay = Math.min(endDay, lastDay);
+            return `${month} ${startDay}-${endDay}`;
+        }
+    })) %>,
+    datasets: [{
+        label: 'Sales',
+        data: <%- JSON.stringify(salesByWeek.map(item => item.totalSales)) %>,
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+        borderColor: 'rgba(59, 130, 246, 1)',
+        borderWidth: 2
+    }]
+};
+
+  // Process daily data
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dailySalesData = Array(7).fill(0);
+  <% if (salesByDay && salesByDay.length > 0) { %>
+    <% salesByDay.forEach(item => { %>
+        dailySalesData[<%= item._id - 1 %>] = <%= item.totalSales %>;
+    <% }); %>
+  <% } %>
+  const dailyData = {
+      labels: days,
+      datasets: [{
+          label: 'Sales',
+          data: dailySalesData,
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 2
+      }]
+  };
+
+  // Process top products data for default filter (yearly)
+  const productsData = {
+      labels: <%- JSON.stringify(topProductsYearly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topProductsYearly.map(item => item.totalSales)) %>,
+          backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+              'rgba(255, 159, 64, 0.7)',
+              'rgba(199, 199, 199, 0.7)',
+              'rgba(83, 102, 255, 0.7)',
+              'rgba(40, 159, 64, 0.7)',
+              'rgba(210, 199, 199, 0.7)'
+          ],
+          borderWidth: 1
+      }]
+  };
+  // Similarly for top categories (default: yearly)
+  const categoriesData = {
+      labels: <%- JSON.stringify(topCategoriesYearly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topCategoriesYearly.map(item => item.totalSales)) %>,
+          backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+              'rgba(255, 159, 64, 0.7)',
+              'rgba(199, 199, 199, 0.7)',
+              'rgba(83, 102, 255, 0.7)',
+              'rgba(40, 159, 64, 0.7)',
+              'rgba(210, 199, 199, 0.7)'
+          ],
+          borderWidth: 1
+      }]
+  };
+  // And for top brands (default: yearly)
+  const brandsData = {
+      labels: <%- JSON.stringify(topBrandsYearly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topBrandsYearly.map(item => item.totalSales)) %>,
+          backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+              'rgba(255, 159, 64, 0.7)',
+              'rgba(199, 199, 199, 0.7)',
+              'rgba(83, 102, 255, 0.7)',
+              'rgba(40, 159, 64, 0.7)',
+              'rgba(210, 199, 199, 0.7)'
+          ],
+          borderWidth: 1
+      }]
+  };
+
+  // Prepare JSON data for each filter period for the top charts
+  const topProductsYearlyData = {
+      labels: <%- JSON.stringify(topProductsYearly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topProductsYearly.map(item => item.totalSales)) %>,
+          backgroundColor: productsData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+  const topProductsMonthlyData = {
+      labels: <%- JSON.stringify(topProductsMonthly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topProductsMonthly.map(item => item.totalSales)) %>,
+          backgroundColor: productsData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+  const topProductsWeeklyData = {
+      labels: <%- JSON.stringify(topProductsWeekly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topProductsWeekly.map(item => item.totalSales)) %>,
+          backgroundColor: productsData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+  const topProductsDailyData = {
+      labels: <%- JSON.stringify(topProductsDaily.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topProductsDaily.map(item => item.totalSales)) %>,
+          backgroundColor: productsData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+
+  const topCategoriesYearlyData = {
+      labels: <%- JSON.stringify(topCategoriesYearly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topCategoriesYearly.map(item => item.totalSales)) %>,
+          backgroundColor: categoriesData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+  const topCategoriesMonthlyData = {
+      labels: <%- JSON.stringify(topCategoriesMonthly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topCategoriesMonthly.map(item => item.totalSales)) %>,
+          backgroundColor: categoriesData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+  const topCategoriesWeeklyData = {
+      labels: <%- JSON.stringify(topCategoriesWeekly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topCategoriesWeekly.map(item => item.totalSales)) %>,
+          backgroundColor: categoriesData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+  const topCategoriesDailyData = {
+      labels: <%- JSON.stringify(topCategoriesDaily.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topCategoriesDaily.map(item => item.totalSales)) %>,
+          backgroundColor: categoriesData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+
+  const topBrandsYearlyData = {
+      labels: <%- JSON.stringify(topBrandsYearly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topBrandsYearly.map(item => item.totalSales)) %>,
+          backgroundColor: brandsData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+  const topBrandsMonthlyData = {
+      labels: <%- JSON.stringify(topBrandsMonthly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topBrandsMonthly.map(item => item.totalSales)) %>,
+          backgroundColor: brandsData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+  const topBrandsWeeklyData = {
+      labels: <%- JSON.stringify(topBrandsWeekly.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topBrandsWeekly.map(item => item.totalSales)) %>,
+          backgroundColor: brandsData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+  const topBrandsDailyData = {
+      labels: <%- JSON.stringify(topBrandsDaily.map(item => item.name)) %>,
+      datasets: [{
+          label: 'Sales',
+          data: <%- JSON.stringify(topBrandsDaily.map(item => item.totalSales)) %>,
+          backgroundColor: brandsData.datasets[0].backgroundColor,
+          borderWidth: 1
+      }]
+  };
+
+  // Initialize charts on DOM load
+  document.addEventListener('DOMContentLoaded', function() {
+      const salesChartCtx = document.getElementById('sales-chart').getContext('2d');
+      let salesChart = new Chart(salesChartCtx, {
+          type: 'bar',
+          data: yearlyData,
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: { y: { beginAtZero: true } }
+          }
+      });
+
+      const productsChartCtx = document.getElementById('products-chart').getContext('2d');
+      const productsChart = new Chart(productsChartCtx, {
+          type: 'bar',
+          data: topProductsYearlyData,
+          options: {
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } }
+          }
+      });
+
+      const categoriesChartCtx = document.getElementById('categories-chart').getContext('2d');
+      const categoriesChart = new Chart(categoriesChartCtx, {
+          type: 'bar',
+          data: topCategoriesYearlyData,
+          options: {
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } }
+          }
+      });
+
+      const brandsChartCtx = document.getElementById('brands-chart').getContext('2d');
+      const brandsChart = new Chart(brandsChartCtx, {
+          type: 'bar',
+          data: topBrandsYearlyData,
+          options: {
+              indexAxis: 'y',
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } }
+          }
+      });
+
+      // Handle time filter change for all charts
+      document.getElementById('time-filter').addEventListener('change', function() {
+          const filterValue = this.value;
+          let newSalesData;
+          let newProductsData, newCategoriesData, newBrandsData;
+
+          if (filterValue === 'yearly') {
+              newSalesData = yearlyData;
+              newProductsData = topProductsYearlyData;
+              newCategoriesData = topCategoriesYearlyData;
+              newBrandsData = topBrandsYearlyData;
+          } else if (filterValue === 'monthly') {
+              newSalesData = monthlyData;
+              newProductsData = topProductsMonthlyData;
+              newCategoriesData = topCategoriesMonthlyData;
+              newBrandsData = topBrandsMonthlyData;
+          } else if (filterValue === 'weekly') {
+              newSalesData = weeklyData;
+              newProductsData = topProductsWeeklyData;
+              newCategoriesData = topCategoriesWeeklyData;
+              newBrandsData = topBrandsWeeklyData;
+          } else if (filterValue === 'daily') {
+              newSalesData = dailyData;
+              newProductsData = topProductsDailyData;
+              newCategoriesData = topCategoriesDailyData;
+              newBrandsData = topBrandsDailyData;
+          }
+
+          // Update charts with the new data
+          salesChart.data = newSalesData;
+          salesChart.update();
+
+          productsChart.data = newProductsData;
+          productsChart.update();
+
+          categoriesChart.data = newCategoriesData;
+          categoriesChart.update();
+
+          brandsChart.data = newBrandsData;
+          brandsChart.update();
+      });
+  });
 </script>
 
 <%- include("../admin/partials/footer") -%>

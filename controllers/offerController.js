@@ -113,6 +113,20 @@ const verifyOffer = async(req,res)=>{
             error:[{path:'name',msg:'Offer is already created'}]
         })
        } 
+
+       if(discountPercentage > 85){
+        return res.status(400).json({
+            success:false,
+            error:[{path:'discountPercentage',msg:"Offer cannot be set to more than 85%."}]
+        })
+       }
+
+       if(discountPercentage <= 0){
+        return res.status(400).json({
+            success:false,
+            error:[{path:'discountPercentage',msg:'Offer cannot be set less than 1%'}]
+        })
+       }
         
         let offerData ={
             name,
@@ -252,6 +266,20 @@ const verifyEdit = async(req,res)=>{
         return res.status(400).json({
             success:false,
             message:'Offer not found'
+        })
+    }
+
+    if(discountPercentage > 85){
+        return res.status(400).json({
+            success:false,
+            error:[{path:'discountPercentage',msg:'Offer cannot be set to more than 85%.'}]
+        })
+    }
+
+    if(discountPercentage <= 0){
+        return res.status(400).json({
+            success:false,
+            error:[{path:'discountPercentage',msg:"Offer cannot be set to less than 1%"}]
         })
     }
 
