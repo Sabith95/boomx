@@ -32,7 +32,7 @@ user_route.get('/auth/google/callback', passport.authenticate('google', {
 });
 
 // Google login callback
-user_route.get('/signup', userController.loadSignUp);
+user_route.get('/signup',userAuth.redirectIfAuthenticated, userController.loadSignUp);
 
 
 user_route.post('/send-otp',upload.single('image'), userController.sendOtp);
