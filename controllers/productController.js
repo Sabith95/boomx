@@ -20,7 +20,7 @@ const loadAddProducts = async (req,res)=>{
         const categories= await category.find()
         
 
-        res.render('admin/addProduct',{brands,categories})
+        res.render('admin/addproduct',{brands,categories})
     } catch (error) {
         console.error("Error",error)
     }
