@@ -2,9 +2,24 @@ const product = require('../models/productModel')
 const brand =require('../models/brandModel')
 const category=require('../models/categoryModel');
 const { search } = require('../routes/adminRoutes');
+const jwtHelper = require('../utils/jwtHelper');
+const User = require('../models/userModel');
+const { decode } = require('jsonwebtoken');
+
 
 const loadShope = async (req, res) => {
     try {
+        let user = null
+        const token = req.cookies.token
+        if(token){
+            const decoded = jwtHelper.verifyToken(token)
+            user = await User.findById(decoded.user._id)
+            if(!user || !user.isListed){
+                res.clearCookie('token')
+                return res.redirect('/user/login')
+            }
+        }
+
         const page = parseInt(req.query.page, 10) || 1;
         const limit = 8;
         const skip = (page - 1) * limit;
@@ -95,6 +110,17 @@ const loadShope = async (req, res) => {
 
 const loadViewProduct = async(req,res)=>{
     try {
+
+        let user = null
+        const token = req.cookies.token
+        if(token){
+            const decoded = jwtHelper.verifyToken(token)
+            const user = await User.findById(decoded.user._id)
+            if(!user || !user.isListed){
+                res.clearCookie('token')
+                return res.redirect('/user/login')
+            }
+        }
         const id = req.params.id
 
         const products =await product.findById(id)
@@ -125,6 +151,17 @@ const loadViewProduct = async(req,res)=>{
 
 const loadCategories = async(req,res)=>{
     try {
+        let user = null
+        const token = req.cookies.token
+        if(token){
+            const decoded = jwtHelper.verifyToken(token)
+            const user = await User.findById(decoded.user._id)
+            if(!user || !user.isListed){
+                res.clearCookie('token')
+                return res.redirect('/user/login')
+            }
+        }
+        
         const page = parseInt(req.query.page || 1)
         const limit=5
         const skip = (page -1)*limit

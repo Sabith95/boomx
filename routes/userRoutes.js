@@ -51,9 +51,9 @@ user_route.get('/home',userAuth.checkUserStatus, userController.loadDashboard);
 
 //shope
 
-user_route.get('/shope',userAuth.checkUserStatus,userProductController.loadShope)
-user_route.get('/view-product/:id',userAuth.checkUserStatus,userProductController.loadViewProduct)
-user_route.get('/categories/:id',userAuth.checkUserStatus,userProductController.loadCategories)
+user_route.get('/shope',userProductController.loadShope)
+user_route.get('/view-product/:id',userProductController.loadViewProduct)
+user_route.get('/categories/:id',userProductController.loadCategories)
 user_route.get('/logout',userAuth.checkUserStatus,userController.logoutUser)
 
 //profile
