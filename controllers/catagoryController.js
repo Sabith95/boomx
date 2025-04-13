@@ -53,6 +53,14 @@ const verifyCategory = async (req, res) => {
             }
 
         const { name, description } = req.body;
+
+        if(/^\d+$/.test(name)){
+          return res.status(400).json({
+              success:false,
+              error:[{path:'name',msg:'Category cannot be numbers only'}]
+          })
+      }
+
         const existingCategory= await category.findOne({
           name:{$regex: new RegExp('^' + name + '$','i')}
         })
@@ -144,6 +152,13 @@ const editCategory = async (req, res) => {
   
     const { id } = req.params;
     const { name, description } = req.body;
+
+    if(/^\d+$/.test(name)){
+      return res.status(400).json({
+          success:false,
+          error:[{path:'name',msg:'Category cannot be numbers only'}]
+      })
+  }
   
     // Verify that required fields are provided
     if (!name || !description) {

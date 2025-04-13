@@ -45,6 +45,14 @@ const verifyBrand = async(req,res)=>{
                     }
 
         const {name,description} = req.body
+
+        if(/^\d+$/.test(name)){
+            return res.status(400).json({
+                success:false,
+                error:[{path:'name',msg:'Brand cannot be numbers only'}]
+            })
+        }
+
         const existingBrand = await brand.findOne({
             name:{$regex: new RegExp('^' + name + '$','i')}
         })
@@ -137,6 +145,12 @@ const editBrand  = async (req,res)=>{
 
         if(!name || !description){
             return res.status(400).json({success:false,message:"Name and Descriptions are required"})
+        }
+        if(/^\d+$/.test(name)){
+            return res.status(400).json({
+                success:false,
+                error:[{path:'name',msg:'Brand cannot be numbers only'}]
+            })
         }
         const duplicate = await brand.findOne({
             name:name.trim(),

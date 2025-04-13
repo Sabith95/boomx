@@ -97,17 +97,13 @@ async function getSalesByMonth(year) {
   ]);
 }
 
-// Server-side changes first - getSalesByWeek function to modify in your controller
 async function getSalesByWeek() {
-  // Get date for last 4 weeks (or 2 weeks before current month + current month)
   const today = new Date();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
   
-  // Start from beginning of current month
   const startOfCurrentMonth = new Date(currentYear, currentMonth, 1);
   
-  // Go back 2 weeks from start of current month
   const twoWeeksBeforeCurrentMonth = new Date(startOfCurrentMonth);
   twoWeeksBeforeCurrentMonth.setDate(twoWeeksBeforeCurrentMonth.getDate() - 14);
   
