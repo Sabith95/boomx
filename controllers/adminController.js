@@ -102,15 +102,16 @@ async function getSalesByWeek() {
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
   
+  
   const startOfCurrentMonth = new Date(currentYear, currentMonth, 1);
   
-  const twoWeeksBeforeCurrentMonth = new Date(startOfCurrentMonth);
-  twoWeeksBeforeCurrentMonth.setDate(twoWeeksBeforeCurrentMonth.getDate() - 14);
+  const sixWeeksAgo = new Date(today);
+  sixWeeksAgo.setDate(sixWeeksAgo.getDate() - 42);
   
-  return await Order.aggregate([
+  const results = await Order.aggregate([
     {
       $match: {
-        createdAt: { $gte: twoWeeksBeforeCurrentMonth },
+        createdAt: { $gte: sixWeeksAgo },
         status: { $nin: ['Failed', 'Cancelled'] }
       }
     },
@@ -119,15 +120,71 @@ async function getSalesByWeek() {
         _id: {
           year: { $year: "$createdAt" },
           month: { $month: "$createdAt" },
-          week: { $week: "$createdAt" }
+          day: { $dayOfMonth: "$createdAt" }
         },
         minDate: { $min: "$createdAt" },
-        maxDate: { $max: "$createdAt" },
         totalSales: { $sum: '$total' }
       }
     },
     { $sort: { 'minDate': 1 } }
   ]);
+  
+  const weeklyData = [];
+  let currentWeek = null;
+  let currentWeekStart = null;
+  let currentWeekEnd = null;
+  let currentWeekTotal = 0;
+  
+  for (const result of results) {
+    const date = new Date(result.minDate);
+    const dayOfMonth = date.getDate();
+    
+    let weekOfMonth;
+    if (dayOfMonth >= 1 && dayOfMonth <= 7) {
+      weekOfMonth = 1; // 1st week (1-7)
+    } else if (dayOfMonth >= 8 && dayOfMonth <= 14) {
+      weekOfMonth = 2; // 2nd week (8-14)
+    } else if (dayOfMonth >= 15 && dayOfMonth <= 21) {
+      weekOfMonth = 3; // 3rd week (15-21)
+    } else if (dayOfMonth >= 22 && dayOfMonth <= 28) {
+      weekOfMonth = 4; // 4th week (22-28)
+    } else {
+      weekOfMonth = 5; // 5th week (29-31)
+    }
+    
+    const monthYear = `${date.getFullYear()}-${date.getMonth() + 1}`;
+    const weekKey = `${monthYear}-${weekOfMonth}`;
+    
+    if (!currentWeek || currentWeek !== weekKey) {
+      if (currentWeek) {
+        weeklyData.push({
+          _id: currentWeek,
+          minDate: currentWeekStart,
+          maxDate: currentWeekEnd,
+          totalSales: currentWeekTotal
+        });
+      }
+      
+      currentWeek = weekKey;
+      currentWeekStart = result.minDate;
+      currentWeekEnd = result.minDate;
+      currentWeekTotal = result.totalSales;
+    } else {
+      currentWeekEnd = result.minDate;
+      currentWeekTotal += result.totalSales;
+    }
+  }
+  
+  if (currentWeek) {
+    weeklyData.push({
+      _id: currentWeek,
+      minDate: currentWeekStart,
+      maxDate: currentWeekEnd,
+      totalSales: currentWeekTotal
+    });
+  }
+  
+  return weeklyData;
 }
 
 
